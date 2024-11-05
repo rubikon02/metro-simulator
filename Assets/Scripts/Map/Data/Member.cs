@@ -9,6 +9,6 @@ namespace Map.Data {
         public string Role { get; set; }
         public float Lat { get; set; }
         public float Lon { get; set; }
-        public List<Coordinate> Geometry { get; set; }
+        public List<Coordinates> Geometry { get; set; }
     }
 }

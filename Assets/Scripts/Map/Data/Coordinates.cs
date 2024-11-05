@@ -2,7 +2,7 @@ using System;
 
 namespace Map.Data {
     [Serializable]
-    public class Coordinate {
+    public class Coordinates {
         public float Lat { get; set; }
         public float Lon { get; set; }
     }
