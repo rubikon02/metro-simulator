@@ -58,3 +58,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stopPrefab: {fileID: 6313592622958116971, guid: ab6c585e17dd31b458b17f9fcda90da5, type: 3}
+  platformPrefab: {fileID: -4361920988617862871, guid: 0db73fbfe39c7ed4b93d5bbf1d99125e, type: 3}
+  pathPointPrefab: {fileID: -8357229483341192498, guid: 2dd02112f30ef534f92b556377257337, type: 3}
