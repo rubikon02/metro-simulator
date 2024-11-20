@@ -57,6 +57,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dc08c1850a44e81a3c681adc6c36c45, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  subwayLinePrefab: {fileID: 4521851899110179318, guid: 3385b4d73cf15c04599623467e8d2b3b, type: 3}
+  pathPrefab: {fileID: -4577281931869942905, guid: 0b316abe61a39594b86c39401e10cbdc, type: 3}
   stopPrefab: {fileID: 6313592622958116971, guid: ab6c585e17dd31b458b17f9fcda90da5, type: 3}
   platformPrefab: {fileID: -4361920988617862871, guid: 0db73fbfe39c7ed4b93d5bbf1d99125e, type: 3}
   pathPointPrefab: {fileID: -8357229483341192498, guid: 2dd02112f30ef534f92b556377257337, type: 3}

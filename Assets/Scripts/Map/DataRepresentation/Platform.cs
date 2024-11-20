@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using Map.Data;
-using UnityEngine;
 
 namespace Map.DataRepresentation {
-    public class Platform : MonoBehaviour {
-        public Coordinates cords;
+    public class Platform : MapElement {
+        public List<Coordinates> points;
     }
 }

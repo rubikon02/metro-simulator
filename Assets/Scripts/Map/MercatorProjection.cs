@@ -50,7 +50,7 @@ namespace Map {
         }
 
         public static Vector3 CoordsToPosition(Coordinates coordinates) {
-            return CoordsToPosition(coordinates.Lon, coordinates.Lat);
+            return CoordsToPosition(coordinates.lon, coordinates.lat);
         }
 
         public static Vector3 CoordsToPosition(float longitude, float latitude) {

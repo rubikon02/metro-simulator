@@ -9,6 +9,6 @@ namespace Map.Data {
         public float MinLat { get; set; }
         public float MaxLat { get; set; }
 
-        public Coordinates Center => new() {Lon = (MinLon + MaxLon) / 2, Lat = (MinLat + MaxLat) / 2};
+        public Coordinates Center => new() {lon = (MinLon + MaxLon) / 2, lat = (MinLat + MaxLat) / 2};
     }
 }

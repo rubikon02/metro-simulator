@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Map.Data {
     [Serializable]
@@ -10,5 +11,12 @@ namespace Map.Data {
         public float Lat { get; set; }
         public float Lon { get; set; }
         public List<Coordinates> Geometry { get; set; }
+
+        public Bounds Bounds => new() {
+            MinLon = Geometry.Min(el => el.lon),
+            MaxLon = Geometry.Max(el => el.lon),
+            MinLat = Geometry.Min(el => el.lat),
+            MaxLat = Geometry.Max(el => el.lat),
+        };
     }
 }
