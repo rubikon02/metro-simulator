@@ -1,4 +1,3 @@
-using Map.Data;
 using UnityEngine;
 
 namespace Map.DataRepresentation {

@@ -61,4 +61,4 @@ MonoBehaviour:
   pathPrefab: {fileID: -4577281931869942905, guid: 0b316abe61a39594b86c39401e10cbdc, type: 3}
   stopPrefab: {fileID: 6313592622958116971, guid: ab6c585e17dd31b458b17f9fcda90da5, type: 3}
   platformPrefab: {fileID: -4361920988617862871, guid: 0db73fbfe39c7ed4b93d5bbf1d99125e, type: 3}
-  pathPointPrefab: {fileID: -8357229483341192498, guid: 2dd02112f30ef534f92b556377257337, type: 3}
+  platformPointPrefab: {fileID: 8599825339719242083, guid: b35adfd80ce069e49b0cb9d29a406ce3, type: 3}

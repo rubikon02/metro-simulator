@@ -44,3 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc8eb4ecd618ae74db979b76a37d8e28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  reference: 0
+  pathPoints: []
+  pathPointPrefab: {fileID: -8357229483341192498, guid: 2dd02112f30ef534f92b556377257337, type: 3}

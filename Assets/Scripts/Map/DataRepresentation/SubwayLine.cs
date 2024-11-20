@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Map.DataRepresentation {
     public class SubwayLine : MonoBehaviour {

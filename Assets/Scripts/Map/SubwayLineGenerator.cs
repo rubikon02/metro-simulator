@@ -1,4 +1,3 @@
-using System.Linq;
 using Map.Data;
 using Map.DataRepresentation;
 using UnityEngine;
@@ -11,7 +10,7 @@ namespace Map {
         public Path pathPrefab;
         public Stop stopPrefab;
         public Platform platformPrefab;
-        public PathPoint pathPointPrefab;
+        public PlatformPoint platformPointPrefab;
 
         public void Generate() {
             Debug.Log("Map generation started");
@@ -22,15 +21,20 @@ namespace Map {
                     Quaternion.identity
                 );
                 subwayLine.id = element.ID;
+                subwayLine.name = element.Tags.Name;
 
                 foreach (var member in element.Members) {
                     if (member.Role == "stop") {
                         var stop = GenerateStop(member);
+                        stop.transform.parent = subwayLine.transform;
                         subwayLine.stops.Add(stop);
-                    } else if (member.Role == "platform") {
-                        // GeneratePlatform(member);
+                    } else if (member.Role == "platform" && member.Geometry != null) {
+                        var platform = GeneratePlatform(member);
+                        platform.transform.parent = subwayLine.transform;
+                        subwayLine.platforms.Add(platform);
                     } else if (member.Role == "") {
                         var path = GeneratePath(member);
+                        path.transform.parent = subwayLine.transform;
                         subwayLine.paths.Add(path);
                     }
                 }
@@ -48,15 +52,22 @@ namespace Map {
             return stop;
         }
 
-        // private void GeneratePlatform(Member member) {
-        //     if (member.Geometry == null) return;
-        //     foreach (var coords in member.Geometry) {
-        //         var position = MercatorProjection.CoordsToPosition(coords);
-        //         var deltaPosition = position - MapManager.I.OriginPosition;
-        //         var stop = Instantiate(platformPrefab, deltaPosition, Quaternion.identity);
-        //         stop.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.yellow;
-        //     }
-        // }
+        private Platform GeneratePlatform(Member member) {
+            var platform = Instantiate(
+                platformPrefab,
+                MercatorProjection.CoordsToPosition(member.Bounds.Center) - MapManager.I.OriginPosition,
+                Quaternion.identity
+            );
+            foreach (var coordinates in member.Geometry) {
+                var position = MercatorProjection.CoordsToPosition(coordinates);
+                var deltaPosition = position - MapManager.I.OriginPosition;
+                var platformPoint = Instantiate(platformPointPrefab, deltaPosition, Quaternion.identity);
+                platformPoint.transform.parent = platform.transform;
+                platformPoint.coordinates = coordinates;
+                platformPoint.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.yellow;
+            }
+            return platform;
+        }
 
         private Path GeneratePath(Member member) {
             var path = Instantiate(
@@ -65,16 +76,7 @@ namespace Map {
                 Quaternion.identity
             );
             path.reference = member.Ref;
-
-            foreach (var coordinates in member.Geometry) {
-                var position = MercatorProjection.CoordsToPosition(coordinates);
-                var deltaPosition = position - MapManager.I.OriginPosition;
-                var pathPoint = Instantiate(pathPointPrefab, deltaPosition, Quaternion.identity);
-                pathPoint.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.green;
-                pathPoint.coordinates = coordinates;
-                path.pathPoints.Add(pathPoint);
-            }
-
+            path.Generate(member.Geometry);
             return path;
         }
     }
