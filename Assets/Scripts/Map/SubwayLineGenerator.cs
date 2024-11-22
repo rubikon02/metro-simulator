@@ -1,3 +1,4 @@
+using System;
 using Map.Data;
 using Map.DataRepresentation;
 using UnityEngine;
@@ -33,7 +34,7 @@ namespace Map {
                         platform.transform.parent = subwayLine.transform;
                         subwayLine.platforms.Add(platform);
                     } else if (member.Role == "") {
-                        var path = GeneratePath(member);
+                        var path = GeneratePath(member, subwayLine.name);
                         path.transform.parent = subwayLine.transform;
                         subwayLine.paths.Add(path);
                     }
@@ -69,14 +70,46 @@ namespace Map {
             return platform;
         }
 
-        private Path GeneratePath(Member member) {
+        private Path GeneratePath(Member member, string lineName) {
             var path = Instantiate(
                 pathPrefab,
                 MercatorProjection.CoordsToPosition(member.Bounds.Center) - MapManager.I.OriginPosition,
                 Quaternion.identity
             );
             path.reference = member.Ref;
-            path.Generate(member.Geometry);
+
+            Color lineColor;
+            switch(lineName) {
+                case "U1 Oberlaa – Leopoldau":
+                case "U1 Leopoldau – Oberlaa":
+                    lineColor = Color.green;
+                    break;
+                case "U2 Schottentor – Aspernstraße":
+                case "U2 Aspernstraße – Schottentor":
+                    lineColor = Color.red;
+                    break;
+                case "U2 Schottentor – Seestadt":
+                case "U2 Seestadt – Schottentor":
+                    lineColor = Color.clear;
+                    break;
+                case "U3 Ottakring – Simmering":
+                case "U3 Simmering – Ottakring":
+                    lineColor = Color.yellow;
+                    break;
+                case "U4 Hütteldorf – Heiligenstadt":
+                case "U4 Heiligenstadt – Hütteldorf":
+                    lineColor = Color.blue;
+                    break;
+                case "U6 Siebenhirten – Floridsdorf":
+                case "U6 Floridsdorf – Siebenhirten":
+                    lineColor = Color.cyan;
+                    break;
+
+                default:
+                    lineColor = Color.black;
+                    break;
+            }
+            path.Generate(member.Geometry, lineColor);
             return path;
         }
     }

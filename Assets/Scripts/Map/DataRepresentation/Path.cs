@@ -7,13 +7,13 @@ namespace Map.DataRepresentation {
         public List<PathPoint> pathPoints;
         public PathPoint pathPointPrefab;
 
-        public void Generate(List<Coordinates> geometry) {
+        public void Generate(List<Coordinates> geometry, Color lineColor) {
             foreach (var coordinates in geometry) {
                 var position = MercatorProjection.CoordsToPosition(coordinates);
                 var deltaPosition = position - MapManager.I.OriginPosition;
                 var pathPoint = Instantiate(pathPointPrefab, deltaPosition, Quaternion.identity);
                 pathPoint.transform.parent = transform;
-                pathPoint.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.green;
+                pathPoint.gameObject.GetComponentInChildren<MeshRenderer>().material.color = lineColor;
                 pathPoint.coordinates = coordinates;
                 pathPoints.Add(pathPoint);
             }
