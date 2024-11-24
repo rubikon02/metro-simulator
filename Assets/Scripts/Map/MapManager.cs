@@ -4,13 +4,21 @@ using Utils;
 
 namespace Map {
     public class MapManager : MonoSingleton<MapManager> {
-        public OsmData OsmData { get; private set; }
-        public Coordinates OriginCoords => OsmData.Bounds.Center;
-        public Vector3 OriginPosition => MercatorProjection.CoordsToPosition(OriginCoords);
+        private OsmData osmData;
+        private Coordinates OriginCoords => osmData.Bounds.Center;
+        private Vector3 OriginPosition => MercatorProjection.CoordsToPosition(OriginCoords);
+
+        public static Vector3 WorldPosition(Coordinates position) {
+            return WorldPosition(position.lon, position.lat);
+        }
+
+        public static Vector3 WorldPosition(float longitude, float latitude) {
+            return MercatorProjection.CoordsToPosition(longitude, latitude) - I.OriginPosition;
+        }
 
         private void Start() {
-            OsmData = MapFileReader.Load();
-            SubwayLineGenerator.I.Generate();
+            osmData = MapFileReader.Load();
+            SubwayLineGenerator.I.Generate(osmData);
         }
     }
 }

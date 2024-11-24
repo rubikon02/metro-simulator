@@ -11,11 +11,7 @@ namespace Map.DataRepresentation {
             lineRenderer.positionCount = geometry.Count;
             lineRenderer.startColor = lineColor;
             lineRenderer.endColor = lineColor;
-            lineRenderer.SetPositions(
-                geometry.Select(
-                    coordinates => MercatorProjection.CoordsToPosition(coordinates) - MapManager.I.OriginPosition
-                ).ToArray()
-            );
+            lineRenderer.SetPositions(geometry.Select(MapManager.WorldPosition).ToArray());
         }
     }
 }

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Map.Data;
 using Map.DataRepresentation;
@@ -17,12 +16,12 @@ namespace Map {
         public Platform platformPrefab;
         public PlatformPoint platformPointPrefab;
 
-        public void Generate() {
+        public void Generate(OsmData osmData) {
             Debug.Log("Map generation started");
-            foreach (var element in MapManager.I.OsmData.Elements) {
+            foreach (var element in osmData.Elements) {
                 var subwayLine = Instantiate(
                     subwayLinePrefab,
-                    MercatorProjection.CoordsToPosition(element.Bounds.Center) - MapManager.I.OriginPosition,
+                    MapManager.WorldPosition(element.Bounds.Center),
                     Quaternion.identity
                 );
                 subwayLine.id = element.ID;
@@ -48,9 +47,11 @@ namespace Map {
         }
 
         private Stop GenerateStop(Member member) {
-            var position = MercatorProjection.CoordsToPosition(member.Lon, member.Lat);
-            var deltaPosition = position - MapManager.I.OriginPosition;
-            var stop = Instantiate(stopPrefab, deltaPosition, Quaternion.identity);
+            var stop = Instantiate(
+                stopPrefab,
+                MapManager.WorldPosition(member.Lon, member.Lat),
+                Quaternion.identity
+            );
             stop.reference = member.Ref;
             stop.coordinates = new Coordinates { lat = member.Lat, lon = member.Lon };
             stop.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
@@ -60,13 +61,15 @@ namespace Map {
         private Platform GeneratePlatform(Member member) {
             var platform = Instantiate(
                 platformPrefab,
-                MercatorProjection.CoordsToPosition(member.Bounds.Center) - MapManager.I.OriginPosition,
+                MapManager.WorldPosition(member.Bounds.Center),
                 Quaternion.identity
             );
             foreach (var coordinates in member.Geometry) {
-                var position = MercatorProjection.CoordsToPosition(coordinates);
-                var deltaPosition = position - MapManager.I.OriginPosition;
-                var platformPoint = Instantiate(platformPointPrefab, deltaPosition, Quaternion.identity);
+                var platformPoint = Instantiate(
+                    platformPointPrefab,
+                    MapManager.WorldPosition(coordinates),
+                    Quaternion.identity
+                );
                 platformPoint.transform.parent = platform.transform;
                 platformPoint.coordinates = coordinates;
                 platformPoint.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.yellow;
@@ -77,7 +80,7 @@ namespace Map {
         private Path GeneratePath(Member member, string lineName, string hexColor) {
             var path = Instantiate(
                 pathPrefab,
-                MercatorProjection.CoordsToPosition(member.Bounds.Center) - MapManager.I.OriginPosition,
+                MapManager.WorldPosition(member.Bounds.Center),
                 Quaternion.identity
             );
             path.reference = member.Ref;
@@ -113,6 +116,5 @@ namespace Map {
             { "U6 Siebenhirten – Floridsdorf", Color.cyan },
             { "U6 Floridsdorf – Siebenhirten", Color.cyan },
         };
-
     }
 }
