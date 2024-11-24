@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Map.Data;
 using Map.DataRepresentation;
 using UnityEngine;
@@ -6,6 +7,9 @@ using Utils;
 
 namespace Map {
     public class SubwayLineGenerator : MonoSingleton<SubwayLineGenerator> {
+        [Header("Settings")]
+        public bool useCustomColors = true;
+
         [Header("Map element prefabs")]
         public SubwayLine subwayLinePrefab;
         public Path pathPrefab;
@@ -34,7 +38,7 @@ namespace Map {
                         platform.transform.parent = subwayLine.transform;
                         subwayLine.platforms.Add(platform);
                     } else if (member.Role == "") {
-                        var path = GeneratePath(member, subwayLine.name);
+                        var path = GeneratePath(member, subwayLine.name, element.Tags.Colour);
                         path.transform.parent = subwayLine.transform;
                         subwayLine.paths.Add(path);
                     }
@@ -70,7 +74,7 @@ namespace Map {
             return platform;
         }
 
-        private Path GeneratePath(Member member, string lineName) {
+        private Path GeneratePath(Member member, string lineName, string hexColor) {
             var path = Instantiate(
                 pathPrefab,
                 MercatorProjection.CoordsToPosition(member.Bounds.Center) - MapManager.I.OriginPosition,
@@ -79,38 +83,36 @@ namespace Map {
             path.reference = member.Ref;
 
             Color lineColor;
-            switch(lineName) {
-                case "U1 Oberlaa – Leopoldau":
-                case "U1 Leopoldau – Oberlaa":
-                    lineColor = Color.green;
-                    break;
-                case "U2 Schottentor – Aspernstraße":
-                case "U2 Aspernstraße – Schottentor":
-                    lineColor = Color.red;
-                    break;
-                case "U2 Schottentor – Seestadt":
-                case "U2 Seestadt – Schottentor":
-                    lineColor = Color.clear;
-                    break;
-                case "U3 Ottakring – Simmering":
-                case "U3 Simmering – Ottakring":
-                    lineColor = Color.yellow;
-                    break;
-                case "U4 Hütteldorf – Heiligenstadt":
-                case "U4 Heiligenstadt – Hütteldorf":
-                    lineColor = Color.blue;
-                    break;
-                case "U6 Siebenhirten – Floridsdorf":
-                case "U6 Floridsdorf – Siebenhirten":
-                    lineColor = Color.cyan;
-                    break;
-
-                default:
+            if (useCustomColors) {
+                if (!lineColors.TryGetValue(lineName, out lineColor)) {
                     lineColor = Color.black;
-                    break;
+                    Debug.LogError("No color found for line: " + lineName);
+                }
+            } else {
+                if (!ColorUtility.TryParseHtmlString(hexColor, out lineColor)) {
+                    lineColor = Color.black;
+                    Debug.LogError("Wrong html color format: " + hexColor);
+                }
             }
+
             path.Generate(member.Geometry, lineColor);
             return path;
         }
+
+        private readonly Dictionary<string, Color> lineColors = new() {
+            { "U1 Oberlaa – Leopoldau", Color.green },
+            { "U1 Leopoldau – Oberlaa", Color.green },
+            { "U2 Schottentor – Aspernstraße", Color.clear },
+            { "U2 Aspernstraße – Schottentor", Color.clear },
+            { "U2 Schottentor – Seestadt", Color.red },
+            { "U2 Seestadt – Schottentor", Color.red },
+            { "U3 Ottakring – Simmering", Color.yellow },
+            { "U3 Simmering – Ottakring", Color.yellow },
+            { "U4 Hütteldorf – Heiligenstadt", Color.blue },
+            { "U4 Heiligenstadt – Hütteldorf", Color.blue },
+            { "U6 Siebenhirten – Floridsdorf", Color.cyan },
+            { "U6 Floridsdorf – Siebenhirten", Color.cyan },
+        };
+
     }
 }

@@ -1,22 +1,21 @@
 using System.Collections.Generic;
+using System.Linq;
 using Map.Data;
 using UnityEngine;
 
 namespace Map.DataRepresentation {
     public class Path : MapElement {
-        public List<PathPoint> pathPoints;
-        public PathPoint pathPointPrefab;
+        public LineRenderer lineRenderer;
 
         public void Generate(List<Coordinates> geometry, Color lineColor) {
-            foreach (var coordinates in geometry) {
-                var position = MercatorProjection.CoordsToPosition(coordinates);
-                var deltaPosition = position - MapManager.I.OriginPosition;
-                var pathPoint = Instantiate(pathPointPrefab, deltaPosition, Quaternion.identity);
-                pathPoint.transform.parent = transform;
-                pathPoint.gameObject.GetComponentInChildren<MeshRenderer>().material.color = lineColor;
-                pathPoint.coordinates = coordinates;
-                pathPoints.Add(pathPoint);
-            }
+            lineRenderer.positionCount = geometry.Count;
+            lineRenderer.startColor = lineColor;
+            lineRenderer.endColor = lineColor;
+            lineRenderer.SetPositions(
+                geometry.Select(
+                    coordinates => MercatorProjection.CoordsToPosition(coordinates) - MapManager.I.OriginPosition
+                ).ToArray()
+            );
         }
     }
 }

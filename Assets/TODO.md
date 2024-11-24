@@ -1,5 +1,2 @@
-- Names for stops
-- Colors for paths, and good-looking stops color to match
-- Change path points to lines (maybe line renderer or manually create mesh)
 - Add vehicles moving along paths
 - Show stop names above stops
