@@ -5,6 +5,7 @@ using Utils;
 namespace Map {
     public class MapManager : MonoSingleton<MapManager> {
         private OsmData osmData;
+        private OsmStopsData osmStopsData;
         private Coordinates OriginCoords => osmData.Bounds.Center;
         private Vector3 OriginPosition => MercatorProjection.CoordsToPosition(OriginCoords);
 
@@ -18,7 +19,8 @@ namespace Map {
 
         private void Start() {
             osmData = MapFileReader.Load();
-            SubwayLineGenerator.I.Generate(osmData);
+            osmStopsData = MapFileReader.LoadStops();
+            SubwayLineGenerator.I.Generate(osmData, osmStopsData);
         }
     }
 }

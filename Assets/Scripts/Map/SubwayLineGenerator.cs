@@ -7,7 +7,7 @@ using Utils;
 namespace Map {
     public class SubwayLineGenerator : MonoSingleton<SubwayLineGenerator> {
         [Header("Settings")]
-        public bool useCustomColors = true;
+        public bool useCustomColors = false;
 
         [Header("Map element prefabs")]
         public SubwayLine subwayLinePrefab;
@@ -16,8 +16,15 @@ namespace Map {
         public Platform platformPrefab;
         public PlatformPoint platformPointPrefab;
 
-        public void Generate(OsmData osmData) {
+        public void Generate(OsmData osmData, OsmStopsData osmStopsData) {
             Debug.Log("Map generation started");
+
+            foreach(var feat in osmStopsData.Features) {
+                print(feat.Properties.PublicTransport == "station");
+                print(feat.Geometry.Coordinates);
+                print(feat.Properties.Name);
+            }
+            
             foreach (var element in osmData.Elements) {
                 var subwayLine = Instantiate(
                     subwayLinePrefab,
@@ -29,7 +36,19 @@ namespace Map {
 
                 foreach (var member in element.Members) {
                     if (member.Role == "stop") {
-                        var stop = GenerateStop(member);
+
+                        string name = "";
+                        foreach(var feat in osmStopsData.Features) {
+                            if(feat.Properties.PublicTransport == "station") {
+                                if(feat.Geometry.Coordinates.lat - member.Lat <= 0.0001 
+                                    && feat.Geometry.Coordinates.lon - member.Lon <= 0.0001){
+                                        name = feat.Properties.Name;
+                                    }
+                            }
+                        }   
+                        if(name == "") name = "stacja";
+
+                        var stop = GenerateStop(member, name);
                         stop.transform.parent = subwayLine.transform;
                         subwayLine.stops.Add(stop);
                     } else if (member.Role == "platform" && member.Geometry != null) {
@@ -46,7 +65,7 @@ namespace Map {
             Debug.Log("Map generation finished");
         }
 
-        private Stop GenerateStop(Member member) {
+        private Stop GenerateStop(Member member, string name) {
             var stop = Instantiate(
                 stopPrefab,
                 MapManager.WorldPosition(member.Lon, member.Lat),
@@ -55,6 +74,7 @@ namespace Map {
             stop.reference = member.Ref;
             stop.coordinates = new Coordinates { lat = member.Lat, lon = member.Lon };
             stop.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
+            stop.SetName(name);
             return stop;
         }
 
