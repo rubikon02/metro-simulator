@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Map.Data;
 using Map.DataRepresentation;
@@ -15,16 +16,14 @@ namespace Map {
         public Stop stopPrefab;
         public Platform platformPrefab;
         public PlatformPoint platformPointPrefab;
+        public Dictionary<Coordinates, string> stopsDict;
 
         public void Generate(OsmData osmData, OsmStopsData osmStopsData) {
             Debug.Log("Map generation started");
 
-            foreach(var feat in osmStopsData.Features) {
-                print(feat.Properties.PublicTransport == "station");
-                print(feat.Geometry.Coordinates);
-                print(feat.Properties.Name);
-            }
-            
+            stopsDict = GenerateStopsDict(osmStopsData);
+            var stopsDictCopy = stopsDict;
+
             foreach (var element in osmData.Elements) {
                 var subwayLine = Instantiate(
                     subwayLinePrefab,
@@ -36,17 +35,15 @@ namespace Map {
 
                 foreach (var member in element.Members) {
                     if (member.Role == "stop") {
-
-                        string name = "";
-                        foreach(var feat in osmStopsData.Features) {
-                            if(feat.Properties.PublicTransport == "station") {
-                                if(feat.Geometry.Coordinates.lat - member.Lat <= 0.0001 
-                                    && feat.Geometry.Coordinates.lon - member.Lon <= 0.0001){
-                                        name = feat.Properties.Name;
-                                    }
-                            }
+                        string name = "Station";
+                        foreach((Coordinates coords, string stopName) in stopsDictCopy) {
+                            if(Math.Abs(coords.lat - member.Lat) <= 0.001 
+                                && Math.Abs(coords.lon - member.Lon) <= 0.001){
+                                    name = stopName;
+                                    // stopsDictCopy.Remove(coords);
+                                    break;
+                                }
                         }   
-                        if(name == "") name = "stacja";
 
                         var stop = GenerateStop(member, name);
                         stop.transform.parent = subwayLine.transform;
@@ -120,6 +117,16 @@ namespace Map {
 
             path.Generate(member.Geometry, lineColor);
             return path;
+        }
+
+        private Dictionary<Coordinates, string> GenerateStopsDict(OsmStopsData osmStopsData) {
+            Dictionary<Coordinates, string> dict = new Dictionary<Coordinates, string>();
+            foreach(var feat in osmStopsData.Features) {
+                if(feat.Properties.PublicTransport == "station") {
+                    dict.Add(feat.Geometry.Coordinates, feat.Properties.Name);
+                }
+            }   
+            return dict;
         }
 
         private readonly Dictionary<string, Color> lineColors = new() {
