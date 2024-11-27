@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Map.Data;
 using Map.DataRepresentation;
 using UnityEngine;
@@ -23,6 +24,7 @@ namespace Map {
 
             stopsDict = GenerateStopsDict(osmStopsData);
             var stopsDictCopy = stopsDict;
+            List<SubwayLine> subwayLines = new List<SubwayLine>();
 
             foreach (var element in osmData.Elements) {
                 var subwayLine = Instantiate(
@@ -48,6 +50,16 @@ namespace Map {
                         var stop = GenerateStop(member, name);
                         stop.transform.parent = subwayLine.transform;
                         subwayLine.stops.Add(stop);
+                        if(subwayLines.Any(line => 
+                                line.stops.Any(s =>
+                                    Math.Abs(s.coordinates.lat - member.Lat) <= 0.001
+                                    && Math.Abs(s.coordinates.lon - member.Lon) <= 0.001
+                                    )
+                                )
+                            ){
+                            stop.disableName();
+                        }
+
                     } else if (member.Role == "platform" && member.Geometry != null) {
                         var platform = GeneratePlatform(member);
                         platform.transform.parent = subwayLine.transform;
@@ -58,6 +70,7 @@ namespace Map {
                         subwayLine.paths.Add(path);
                     }
                 }
+                subwayLines.Add(subwayLine);
             }
             Debug.Log("Map generation finished");
         }

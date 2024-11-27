@@ -10,5 +10,13 @@ namespace Map.DataRepresentation {
         public void SetName(string stopName) {
             nameText.text = stopName;
         }
+
+        public void disableName() {
+            nameText.enabled = false;
+        }
+
+        public void enableName() {
+            nameText.enabled = true;
+        }
     }
 }
