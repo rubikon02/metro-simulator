@@ -50,9 +50,11 @@ namespace Map {
                         platform.transform.parent = subwayLine.transform;
                         subwayLine.platforms.Add(platform);
                     } else if (member.Role == "") {
-                        var path = GeneratePath(member, subwayLine.name, element.Tags.Colour);
-                        path.transform.parent = subwayLine.transform;
-                        subwayLine.paths.Add(path);
+                        subwayLine.path = (subwayLine.path?.GetPositions().Last() == MapManager.WorldPosition(member.Geometry!.First()))
+                            ? subwayLine.path.AddPart(member.Geometry)
+                            : GeneratePath(member, subwayLine.name, element.Tags.Colour);
+
+                        subwayLine.path.transform.parent = subwayLine.transform;
                     }
                 }
                 subwayLine.transform.parent = subwayLinesContainer.transform;
@@ -68,7 +70,7 @@ namespace Map {
                     feat => MapManager.WorldPosition(feat.Geometry.Coordinates),
                     feat => feat.Properties.Name
                 );
-            
+
             foreach (var stopGroup in stopGroups) {
                 var stopName = stopNames.FirstOrDefault(el =>
                     Vector3.Distance(stopGroup.transform.position, el.Key) <= stopMergeDistance
