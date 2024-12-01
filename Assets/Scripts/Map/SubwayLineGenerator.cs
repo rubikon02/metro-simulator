@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Map.Data;
@@ -9,22 +8,28 @@ using Utils;
 namespace Map {
     public class SubwayLineGenerator : MonoSingleton<SubwayLineGenerator> {
         [Header("Settings")]
-        public bool useCustomColors = false;
+        [SerializeField] private bool useCustomColors = false;
+        [SerializeField] private float stopMergeDistance = 400;
+
+        [Header("Containers")]
+        public GameObject subwayLinesContainer;
+        public GameObject stopGroupsContainer;
 
         [Header("Map element prefabs")]
         public SubwayLine subwayLinePrefab;
         public Path pathPrefab;
         public Stop stopPrefab;
+        public StopGroup stopGroupPrefab;
         public Platform platformPrefab;
         public PlatformPoint platformPointPrefab;
-        public Dictionary<Coordinates, string> stopsDict;
 
-        public void Generate(OsmData osmData, OsmStopsData osmStopsData) {
+
+        private readonly List<SubwayLine> subwayLines = new();
+        private readonly List<StopGroup> stopGroups = new();
+
+        public void Generate(OsmData osmData) {
             Debug.Log("Map generation started");
 
-            stopsDict = GenerateStopsDict(osmStopsData);
-            var stopsDictCopy = stopsDict;
-            List<SubwayLine> subwayLines = new List<SubwayLine>();
 
             foreach (var element in osmData.Elements) {
                 var subwayLine = Instantiate(
@@ -37,29 +42,9 @@ namespace Map {
 
                 foreach (var member in element.Members) {
                     if (member.Role == "stop") {
-                        string name = "Station";
-                        foreach((Coordinates coords, string stopName) in stopsDictCopy) {
-                            if(Math.Abs(coords.lat - member.Lat) <= 0.001 
-                                && Math.Abs(coords.lon - member.Lon) <= 0.001){
-                                    name = stopName;
-                                    // stopsDictCopy.Remove(coords);
-                                    break;
-                                }
-                        }   
-
-                        var stop = GenerateStop(member, name);
+                        var stop = GenerateStop(member);
                         stop.transform.parent = subwayLine.transform;
                         subwayLine.stops.Add(stop);
-                        if(subwayLines.Any(line => 
-                                line.stops.Any(s =>
-                                    Math.Abs(s.coordinates.lat - member.Lat) <= 0.001
-                                    && Math.Abs(s.coordinates.lon - member.Lon) <= 0.001
-                                    )
-                                )
-                            ){
-                            stop.disableName();
-                        }
-
                     } else if (member.Role == "platform" && member.Geometry != null) {
                         var platform = GeneratePlatform(member);
                         platform.transform.parent = subwayLine.transform;
@@ -70,12 +55,33 @@ namespace Map {
                         subwayLine.paths.Add(path);
                     }
                 }
+                subwayLine.transform.parent = subwayLinesContainer.transform;
                 subwayLines.Add(subwayLine);
             }
             Debug.Log("Map generation finished");
         }
 
-        private Stop GenerateStop(Member member, string name) {
+        public void SetStopGroupNames(OsmStopsData osmStopsData) {
+            Dictionary<Vector3, string> stopNames = osmStopsData.Features
+                .Where(feat => feat.Properties.PublicTransport == "station")
+                .ToDictionary(
+                    feat => MapManager.WorldPosition(feat.Geometry.Coordinates),
+                    feat => feat.Properties.Name
+                );
+            
+            foreach (var stopGroup in stopGroups) {
+                var stopName = stopNames.FirstOrDefault(el =>
+                    Vector3.Distance(stopGroup.transform.position, el.Key) <= stopMergeDistance
+                );
+                stopGroup.SetName(stopName.Value ?? string.Empty);
+
+                if (string.IsNullOrEmpty(stopName.Value)) {
+                    Debug.LogWarning("No stop name found for a group");
+                }
+            }
+        }
+
+        private Stop GenerateStop(Member member) {
             var stop = Instantiate(
                 stopPrefab,
                 MapManager.WorldPosition(member.Lon, member.Lat),
@@ -84,7 +90,22 @@ namespace Map {
             stop.reference = member.Ref;
             stop.coordinates = new Coordinates { lat = member.Lat, lon = member.Lon };
             stop.gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.red;
-            stop.SetName(name);
+
+            var nearestGroup = stopGroups.Find(group =>
+                Vector3.Distance(group.transform.position, stop.transform.position) <= stopMergeDistance);
+            if (nearestGroup) {
+                nearestGroup.AddStop(stop);
+            } else {
+                var stopGroup = Instantiate(
+                    stopGroupPrefab,
+                    stop.transform.position,
+                    Quaternion.identity
+                );
+                stopGroup.AddStop(stop);
+                stopGroup.transform.parent = stopGroupsContainer.transform;
+                stopGroups.Add(stopGroup);
+            }
+
             return stop;
         }
 
@@ -130,16 +151,6 @@ namespace Map {
 
             path.Generate(member.Geometry, lineColor);
             return path;
-        }
-
-        private Dictionary<Coordinates, string> GenerateStopsDict(OsmStopsData osmStopsData) {
-            Dictionary<Coordinates, string> dict = new Dictionary<Coordinates, string>();
-            foreach(var feat in osmStopsData.Features) {
-                if(feat.Properties.PublicTransport == "station") {
-                    dict.Add(feat.Geometry.Coordinates, feat.Properties.Name);
-                }
-            }   
-            return dict;
         }
 
         private readonly Dictionary<string, Color> lineColors = new() {

@@ -20,7 +20,8 @@ namespace Map {
         private void Start() {
             osmData = MapFileReader.Load();
             osmStopsData = MapFileReader.LoadStops();
-            SubwayLineGenerator.I.Generate(osmData, osmStopsData);
+            SubwayLineGenerator.I.Generate(osmData);
+            SubwayLineGenerator.I.SetStopGroupNames(osmStopsData);
         }
     }
 }
