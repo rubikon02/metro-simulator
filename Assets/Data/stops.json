@@ -2,7 +2,7 @@
   "type": "FeatureCollection",
   "generator": "overpass-turbo",
   "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.",
-  "timestamp": "2024-11-26T15:48:58Z",
+  "timestamp": "2024-12-02T23:00:32Z",
   "features": [
     {
       "type": "Feature",
@@ -98,6 +98,40 @@
         ]
       },
       "id": "node/62687123"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/67029576",
+        "name": "Leopoldau",
+        "network": "U-Bahn Wien",
+        "network:wikidata": "Q209400",
+        "operator": "Wiener Linien",
+        "operator:wikidata": "Q668849",
+        "platforms": "2",
+        "public_transport": "station",
+        "railway": "station",
+        "railway:position": "14.5",
+        "railway:position:exact": "14.541",
+        "railway:ref": "LU",
+        "ref": "769",
+        "related:wikipedia": "de:Bahnhof Wien Leopoldau",
+        "station": "subway",
+        "subway": "yes",
+        "uic_name": "Wien Leopoldau (U1)",
+        "uic_ref": "8170129",
+        "wheelchair": "yes",
+        "wikidata": "Q12327724",
+        "wikipedia": "de:U-Bahn-Station Leopoldau"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.4520703,
+          48.277582
+        ]
+      },
+      "id": "node/67029576"
     },
     {
       "type": "Feature",
@@ -2097,6 +2131,38 @@
         ]
       },
       "id": "node/4123615290"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "@id": "node/4140677491",
+        "name": "Großfeldsiedlung",
+        "network": "U-Bahn Wien",
+        "network:wikidata": "Q209400",
+        "operator": "Wiener Linien",
+        "operator:wikidata": "Q668849",
+        "platforms": "2",
+        "public_transport": "station",
+        "railway": "station",
+        "railway:position": "13.6",
+        "railway:position:exact": "13.571",
+        "railway:ref": "GF",
+        "station": "subway",
+        "subway": "yes",
+        "uic_name": "Wien Großfeldsiedlung (U1)",
+        "uic_ref": "8170606",
+        "wheelchair": "yes",
+        "wikidata": "Q663988",
+        "wikipedia": "de:U-Bahn-Station Großfeldsiedlung"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.4478821,
+          48.2710952
+        ]
+      },
+      "id": "node/4140677491"
     },
     {
       "type": "Feature",
