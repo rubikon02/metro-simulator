@@ -17,6 +17,7 @@ namespace Map {
 
         [Header("Map element prefabs")]
         public SubwayLine subwayLinePrefab;
+        public LineDirection lineDirectionPrefab;
         public Path pathPrefab;
         public Stop stopPrefab;
         public StopGroup stopGroupPrefab;
@@ -24,7 +25,7 @@ namespace Map {
         public PlatformPoint platformPointPrefab;
 
 
-        private readonly List<SubwayLine> subwayLines = new();
+        public readonly List<SubwayLine> subwayLines = new();
         private readonly List<StopGroup> stopGroups = new();
 
         public void Generate(OsmData osmData) {
@@ -32,34 +33,49 @@ namespace Map {
 
 
             foreach (var element in osmData.Elements) {
-                var subwayLine = Instantiate(
-                    subwayLinePrefab,
+                var lineDirection = Instantiate(
+                    lineDirectionPrefab,
                     MapManager.WorldPosition(element.Bounds.Center),
                     Quaternion.identity
                 );
-                subwayLine.id = element.ID;
-                subwayLine.name = element.Tags.Name;
+                lineDirection.id = element.ID;
+                lineDirection.name = element.Tags.Name;
 
                 foreach (var member in element.Members) {
                     if (member.Role == "stop") {
                         var stop = GenerateStop(member);
-                        stop.transform.parent = subwayLine.transform;
-                        subwayLine.stops.Add(stop);
+                        stop.transform.parent = lineDirection.transform;
+                        lineDirection.stops.Add(stop);
                     } else if (member.Role == "platform" && member.Geometry != null) {
                         var platform = GeneratePlatform(member);
-                        platform.transform.parent = subwayLine.transform;
-                        subwayLine.platforms.Add(platform);
+                        platform.transform.parent = lineDirection.transform;
+                        lineDirection.platforms.Add(platform);
                     } else if (member.Role == "") {
-                        subwayLine.path = (subwayLine.path?.GetPositions().Last() == MapManager.WorldPosition(member.Geometry!.First()))
-                            ? subwayLine.path.AddPart(member.Geometry)
-                            : GeneratePath(member, subwayLine.name, element.Tags.Colour);
+                        lineDirection.path = (lineDirection.path?.GetPositions().Last() == MapManager.WorldPosition(member.Geometry!.First()))
+                            ? lineDirection.path.AddPart(member.Geometry)
+                            : GeneratePath(member, lineDirection.name, element.Tags.Colour);
 
-                        subwayLine.path.transform.parent = subwayLine.transform;
+                        lineDirection.path.transform.parent = lineDirection.transform;
                     }
                 }
-                subwayLine.transform.parent = subwayLinesContainer.transform;
-                subwayLines.Add(subwayLine);
+
+
+                var subwayLine = subwayLines.FirstOrDefault(line => line.name == element.Tags.Ref);
+                if (!subwayLine) {
+                    subwayLine = Instantiate(
+                        subwayLinePrefab,
+                        MapManager.WorldPosition(element.Bounds.Center),
+                        Quaternion.identity
+                    );
+                    subwayLine.name = element.Tags.Ref;
+                    subwayLine.transform.parent = subwayLinesContainer.transform;
+                    subwayLines.Add(subwayLine);
+                }
+
+                subwayLine.directions.Add(lineDirection);
+                lineDirection.transform.parent = subwayLine.transform;
             }
+
             Debug.Log("Map generation finished");
         }
 
@@ -79,6 +95,19 @@ namespace Map {
 
                 if (string.IsNullOrEmpty(stopName.Value)) {
                     Debug.LogWarning("No stop name found for a group");
+                }
+            }
+        }
+
+        public void ConnectOppositeDirections() {
+            foreach (var subwayLine in subwayLines) {
+                foreach (var directionA in subwayLine.directions) {
+                    foreach (var directionB in subwayLine.directions) {
+                        if (directionA.stops.First().name == directionB.stops.Last().name && directionA.stops.Last().name == directionB.stops.First().name) {
+                            directionB.oppositeDirection = directionA;
+                            directionA.oppositeDirection = directionB;
+                        }
+                    }
                 }
             }
         }

@@ -1,4 +1,5 @@
 using Map.Data;
+using Simulation;
 using UnityEngine;
 using Utils;
 
@@ -22,6 +23,8 @@ namespace Map {
             osmStopsData = MapFileReader.LoadStops();
             SubwayLineGenerator.I.Generate(osmData);
             SubwayLineGenerator.I.SetStopGroupNames(osmStopsData);
+            SubwayLineGenerator.I.ConnectOppositeDirections();
+            VehicleSpawner.I.StartSpawning();
         }
     }
 }

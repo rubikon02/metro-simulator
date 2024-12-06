@@ -59,7 +59,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   useCustomColors: 1
   stopMergeDistance: 400
+  subwayLinesContainer: {fileID: 0}
+  stopGroupsContainer: {fileID: 0}
   subwayLinePrefab: {fileID: 4521851899110179318, guid: 3385b4d73cf15c04599623467e8d2b3b, type: 3}
+  lineDirectionPrefab: {fileID: 6690943203339592776, guid: 82fc8c738891a59468e40401d40a8ae2, type: 3}
   pathPrefab: {fileID: -4577281931869942905, guid: 0b316abe61a39594b86c39401e10cbdc, type: 3}
   stopPrefab: {fileID: 6313592622958116971, guid: ab6c585e17dd31b458b17f9fcda90da5, type: 3}
   stopGroupPrefab: {fileID: 2286959235633013633, guid: 17a279730e0669847b004eb9847a4223, type: 3}

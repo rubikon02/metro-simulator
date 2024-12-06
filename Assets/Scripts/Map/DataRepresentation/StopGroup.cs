@@ -11,6 +11,10 @@ namespace Map.DataRepresentation {
         public void SetName(string stopName) {
             name = stopName;
             nameText.text = stopName;
+
+            foreach (var stop in stops) {
+                stop.name = stopName;
+            }
         }
 
         public void AddStop(Stop stop) {
