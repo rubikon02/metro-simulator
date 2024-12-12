@@ -30,6 +30,8 @@ namespace Map.DataRepresentation {
                 0,
                 stops.Average(el => el.transform.position.z)
             );
+
+            stop.SetGroup(this);
         }
 
         /// <summary>
@@ -62,6 +64,10 @@ namespace Map.DataRepresentation {
             }
 
             passenger.transform.localPosition = new Vector3(x * cellSize.x, passenger.transform.localPosition.y, z * cellSize.z);
+        }
+
+        public List<SubwayLine> GetSubwayLines() {
+            return stops.Select(stop => stop.GetSubwayLine()).Distinct().ToList();
         }
     }
 }
