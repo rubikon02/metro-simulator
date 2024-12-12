@@ -26,7 +26,7 @@ namespace Map {
 
 
         public readonly List<SubwayLine> subwayLines = new();
-        private readonly List<StopGroup> stopGroups = new();
+        public readonly List<StopGroup> stopGroups = new();
 
         public void Generate(OsmData osmData) {
             Debug.Log("Map generation started");
@@ -47,9 +47,9 @@ namespace Map {
                         stop.transform.parent = lineDirection.transform;
                         lineDirection.stops.Add(stop);
                     } else if (member.Role == "platform" && member.Geometry != null) {
-                        var platform = GeneratePlatform(member);
-                        platform.transform.parent = lineDirection.transform;
-                        lineDirection.platforms.Add(platform);
+                        // var platform = GeneratePlatform(member);
+                        // platform.transform.parent = lineDirection.transform;
+                        // lineDirection.platforms.Add(platform);
                     } else if (member.Role == "") {
                         lineDirection.path = (lineDirection.path?.GetPositions().Last() == MapManager.WorldPosition(member.Geometry!.First()))
                             ? lineDirection.path.AddPart(member.Geometry)
