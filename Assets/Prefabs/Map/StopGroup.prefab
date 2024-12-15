@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1156497747527644205}
   - component: {fileID: 2286959235633013633}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: StopGroup
-  m_TagString: Untagged
+  m_TagString: Stop
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -61,7 +61,7 @@ GameObject:
   - component: {fileID: 6338081996014586416}
   - component: {fileID: 5858071043413276496}
   - component: {fileID: 7435475187154019733}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,7 +193,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8265279579099379254}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Passengers
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -227,7 +227,7 @@ GameObject:
   - component: {fileID: 5508397946855591572}
   - component: {fileID: 4776095183008932492}
   - component: {fileID: 6815617077908045815}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}

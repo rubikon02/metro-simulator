@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Map.DataRepresentation {
     public class StopGroup : MonoBehaviour {
         [SerializeField] private List<Stop> stops;
-        [SerializeField] private List<Passenger> passengers;
+        public List<Passenger> passengers;
 
         [Header("Components")]
         [SerializeField] private GameObject passengersContainer;

@@ -16,7 +16,7 @@ namespace Simulation {
 
         private void GeneratePassenger() {
             // var startStop = GetRandomStop();
-            var startStop = SubwayLineGenerator.I.stopGroups[0];
+            var startStop = SubwayLineGenerator.I.stopGroups[1];
 
             // StopGroup GetRandomDestinationStopStrategy() => GetRandomStop();
             StopGroup GetRandomDestinationStopStrategy() => GetRandomStopOnTheSameLine(startStop);
