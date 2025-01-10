@@ -429,7 +429,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   direction: {fileID: 0}
-  speed: 100
+  speed: 300
   rotationSpeed: 0.5
   passengersContainer: {fileID: 5432400996337773480}
   passengers: []

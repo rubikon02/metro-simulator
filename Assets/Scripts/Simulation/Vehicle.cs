@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Map.DataRepresentation;
+using System.Linq;
 
 namespace Simulation {
     public class Vehicle : MonoBehaviour {
@@ -61,15 +62,16 @@ namespace Simulation {
             if (!other.gameObject.CompareTag("Stop")) return;
 
             stopped = true;
-            // Debug.Log(other);
             currentStopGroup = other.GetComponent<Stop>().group;
             StartCoroutine(DropOffPassengers());
             StartCoroutine(GatherPassengers());
         }
 
         private IEnumerator GatherPassengers() {
-            while (currentStopGroup.passengers.FindAll(p => p.GetDestination() != currentStopGroup).Count > 0) {
-                var passenger = currentStopGroup.passengers[0];
+            var passengersToGather = currentStopGroup.passengers.FindAll(p => p.GetCurrentTransferDirectionId() == direction.id);
+            while (passengersToGather.Count > 0) {
+                var passenger = passengersToGather.First();
+                passengersToGather.Remove(passenger);
                 currentStopGroup.passengers.Remove(passenger);
                 passengers.Add(passenger);
 
@@ -106,16 +108,19 @@ namespace Simulation {
         }
 
         private IEnumerator DropOffPassengers() {
-            List<Passenger> passengersToDropOff = passengers.FindAll(p => p.GetDestination() == currentStopGroup);
+            List<Passenger> passengersToDropOff = passengers.FindAll(p => p.GetCurrentTransferStop() == currentStopGroup);
             while (passengersToDropOff.Count > 0) {
                 var passenger = passengersToDropOff[0];
                 passengers.Remove(passenger);
                 currentStopGroup.AddPassenger(passenger);
                 passengersToDropOff.RemoveAt(0);
-                passenger.SetColor(Color.gray);
+                passenger.RemoveTransfer();
 
-                yield return new WaitForSeconds(5f);
-                passenger.gameObject.SetActive(false);
+                if(passenger.GetDestination() == currentStopGroup) {
+                    passenger.SetColor(Color.gray);
+                    yield return new WaitForSeconds(5f);
+                    passenger.gameObject.SetActive(false);
+                }
                 yield return new WaitForSeconds(1f / passengerLoadingSpeed);
             }
         }

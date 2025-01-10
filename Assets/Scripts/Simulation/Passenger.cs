@@ -1,10 +1,12 @@
 using System;
+using System.Collections.Generic;
 using Map.DataRepresentation;
 using UnityEngine;
 
 namespace Simulation {
     public class Passenger : MonoBehaviour {
         [SerializeField] private StopGroup destination;
+        [SerializeField] private List<(StopGroup stop, LineDirection direction)> transfers;
         [SerializeField] private float waitingTime;
         private MeshRenderer meshRenderer;
 
@@ -25,8 +27,24 @@ namespace Simulation {
             destination = newDestination;
         }
 
+        public void SetTransfers(List<(StopGroup stop, LineDirection direction)> newTransfers) {
+            transfers = new List<(StopGroup stop, LineDirection direction)>(newTransfers);
+        }
+
         public StopGroup GetDestination() {
             return destination;
+        }
+
+        public StopGroup GetCurrentTransferStop() {
+            return transfers.Count > 0 ? transfers[0].stop : null;
+        }
+
+        public int GetCurrentTransferDirectionId() {
+            return transfers.Count > 0 ? transfers[0].direction.id : -1;
+        }
+
+        public void RemoveTransfer() {
+            transfers.RemoveAt(0);
         }
 
         public void SetColor(Color color) {
