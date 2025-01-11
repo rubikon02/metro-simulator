@@ -1,15 +1,16 @@
-using System;
-using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Map.DataRepresentation;
-    
-    public class MetroPathfinder {
-        public static List<(StopGroup stop, LineDirection direction)> FindShortestPath(StopGroup start, StopGroup destination) {
-            var visited = new HashSet<StopGroup>();
-            var queue = new Queue<List<(StopGroup stop, LineDirection direction)>>();
+using UnityEngine;
 
-            queue.Enqueue(new List<(StopGroup stop, LineDirection direction)> { (start, null) });
+namespace Simulation
+{
+    public class MetroPathfinder {
+        public static List<Transfer> FindShortestPath(StopGroup start, StopGroup destination) {
+            var visited = new HashSet<StopGroup>();
+            var queue = new Queue<List<Transfer>>();
+
+            queue.Enqueue(new List<Transfer> { new(start, null) });
             // foreach (var direction in start.GetSubwayLines().SelectMany(line => line.directions)) {
             //     queue.Enqueue(new List<(StopGroup stop, LineDirection direction)> { (start, direction) });
             // }
@@ -29,12 +30,12 @@ using Map.DataRepresentation;
                             int s0_index = stops.IndexOf(path[0].stop);
                             foreach(var dir1 in directions1) {
                                 var stops1 = dir1.stops.Select(stop => stop.group).ToList();
-                                if(stops1.IndexOf(path[0].stop) >= 0 && stops1.IndexOf(path[0].stop) == s0_index){
-                                    path[0] = (path[0].stop, dir);
+                                if(stops1.IndexOf(path[0].stop) >= 0 && stops1.IndexOf(path[0].stop) == s0_index) {
+                                    path[0].direction = dir;
                                 }
-                            }                            
+                            }
                         }
-                        return new List<(StopGroup stop, LineDirection direction)>(path);
+                        return new List<Transfer>(path);
                     } else {
                         Debug.Log("No path.");
                     }
@@ -46,7 +47,7 @@ using Map.DataRepresentation;
                 foreach (var direction in current.GetSubwayLines().SelectMany(line => line.directions)) {
                     foreach (var neighbor in GetNeighbors(current, direction)) {
                         if (!visited.Contains(neighbor)) {
-                            var newPath = new List<(StopGroup stop, LineDirection direction)>(path) { (neighbor, direction) };
+                            var newPath = new List<Transfer>(path) { new(neighbor, direction) };
                             queue.Enqueue(newPath);
                         }
                     }
@@ -63,3 +64,4 @@ using Map.DataRepresentation;
             }
         }
     }
+}

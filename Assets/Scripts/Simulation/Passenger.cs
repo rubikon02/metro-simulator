@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Map.DataRepresentation;
 using UnityEngine;
@@ -6,7 +5,7 @@ using UnityEngine;
 namespace Simulation {
     public class Passenger : MonoBehaviour {
         [SerializeField] private StopGroup destination;
-        [SerializeField] private List<(StopGroup stop, LineDirection direction)> transfers;
+        [SerializeField] private List<Transfer> transfers;
         [SerializeField] private float waitingTime;
         private MeshRenderer meshRenderer;
 
@@ -27,8 +26,8 @@ namespace Simulation {
             destination = newDestination;
         }
 
-        public void SetTransfers(List<(StopGroup stop, LineDirection direction)> newTransfers) {
-            transfers = new List<(StopGroup stop, LineDirection direction)>(newTransfers);
+        public void SetTransfers(List<Transfer> newTransfers) {
+            transfers = new List<Transfer>(newTransfers);
         }
 
         public StopGroup GetDestination() {
