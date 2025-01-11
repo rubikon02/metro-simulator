@@ -22,10 +22,6 @@ namespace Map.DataRepresentation {
             }
         }
 
-        public string GetName() {
-            return nameText.text;
-        }
-
         public void AddStop(Stop stop) {
             stops.Add(stop);
 

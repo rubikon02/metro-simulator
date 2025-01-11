@@ -154,7 +154,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   destination: {fileID: 0}
+  transfers: []
   waitingTime: 0
+  capsule: {fileID: 6802365906553506115}
 --- !u!1 &6843930013581474347
 GameObject:
   m_ObjectHideFlags: 0

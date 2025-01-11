@@ -1,22 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
 using Map.DataRepresentation;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Simulation {
     public class Passenger : MonoBehaviour {
         [SerializeField] private StopGroup destination;
         [SerializeField] private List<Transfer> transfers;
         [SerializeField] private float waitingTime;
-        private MeshRenderer meshRenderer;
-
-        private void Awake() {
-              Transform capsuleTransform = transform.Find("Capsule");
-            if (capsuleTransform != null) {
-                meshRenderer = capsuleTransform.GetComponent<MeshRenderer>();
-            } else {
-                Debug.LogError("Capsule object not found in Passenger prefab!");
-            }
-        }
+        [SerializeField] private MeshRenderer capsule;
 
         private void FixedUpdate() {
             waitingTime += Time.deltaTime;
@@ -35,22 +28,22 @@ namespace Simulation {
         }
 
         public StopGroup GetCurrentTransferStop() {
-            return transfers.Count > 0 ? transfers[0].stop : null;
+            return transfers.FirstOrDefault()?.stop ?? null;
         }
 
         public int GetCurrentTransferDirectionId() {
-            return transfers.Count > 0 ? transfers[0].direction.id : -1;
+            return transfers.FirstOrDefault()?.direction.id ?? -1;
         }
 
         public void RemoveTransfer() {
+            if (transfers.Count == 0) {
+                Debug.Log(gameObject);
+            }
             transfers.RemoveAt(0);
         }
 
         public void SetColor(Color color) {
-            if (meshRenderer != null) {
-                meshRenderer.material.color = color;
-            }
+            capsule.material.color = color;
         }
-
     }
 }

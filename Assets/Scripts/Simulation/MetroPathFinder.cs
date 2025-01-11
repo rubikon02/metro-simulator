@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Map.DataRepresentation;
-using UnityEngine;
 
 namespace Simulation
 {
@@ -11,34 +10,27 @@ namespace Simulation
             var queue = new Queue<List<Transfer>>();
 
             queue.Enqueue(new List<Transfer> { new(start, null) });
-            // foreach (var direction in start.GetSubwayLines().SelectMany(line => line.directions)) {
-            //     queue.Enqueue(new List<(StopGroup stop, LineDirection direction)> { (start, direction) });
-            // }
+
             while (queue.Count > 0) {
                 var path = queue.Dequeue();
                 var current = path.Last().stop;
 
                 if (current == destination){
-                    if (path != null) {
-
-                        var directions0 = path[0].stop.GetSubwayLines()
-                            .SelectMany(line => line.directions).ToList();
-                        var directions1 = path[1].stop.GetSubwayLines()
-                            .SelectMany(line => line.directions).ToList();
-                        foreach(var dir in directions0) {
-                            var stops = dir.stops.Select(stop => stop.group).ToList();
-                            int s0_index = stops.IndexOf(path[0].stop);
-                            foreach(var dir1 in directions1) {
-                                var stops1 = dir1.stops.Select(stop => stop.group).ToList();
-                                if(stops1.IndexOf(path[0].stop) >= 0 && stops1.IndexOf(path[0].stop) == s0_index) {
-                                    path[0].direction = dir;
-                                }
+                    var directions0 = path[0].stop.GetSubwayLines()
+                        .SelectMany(line => line.directions).ToList();
+                    var directions1 = path[1].stop.GetSubwayLines()
+                        .SelectMany(line => line.directions).ToList();
+                    foreach(var dir in directions0) {
+                        var stops = dir.stops.Select(stop => stop.group).ToList();
+                        int s0_index = stops.IndexOf(path[0].stop);
+                        foreach(var dir1 in directions1) {
+                            var stops1 = dir1.stops.Select(stop => stop.group).ToList();
+                            if(stops1.IndexOf(path[0].stop) >= 0 && stops1.IndexOf(path[0].stop) == s0_index) {
+                                path[0].direction = dir;
                             }
                         }
-                        return new List<Transfer>(path);
-                    } else {
-                        Debug.Log("No path.");
                     }
+                    return new List<Transfer>(path);
                 }
                 if (visited.Contains(current)) continue;
 
