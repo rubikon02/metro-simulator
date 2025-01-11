@@ -14,30 +14,41 @@ namespace UI.TimeIndicator {
         [SerializeField] private TextMeshProUGUI speedText;
         [SerializeField] private Button slowerButton;
         [SerializeField] private Button fasterButton;
+        [SerializeField] private Button playPauseButton;
 
         private readonly DateTime startTime = DateTime.Today.AddHours(8);
         private readonly float[] speeds = { 0.1f, 0.25f, 0.5f, 1f, 2f, 4f, 8f, 16f, 32f, 64f };
         private int currentSpeedIndex = 3;
         private DateTime currentTime;
         private float simulationSpeed = 1f;
+        private bool isPaused = false;
 
         private void Start() {
             slowerButton.onClick.AddListener(() => ChangeSpeed(-1));
             fasterButton.onClick.AddListener(() => ChangeSpeed(1));
+            playPauseButton.onClick.AddListener(TogglePlayPause);
             UpdateSpeedText();
             UpdateButtonStates();
             InitializeTime();
         }
 
         private void Update() {
-            currentTime = currentTime.AddSeconds(Time.deltaTime * TimeIndicator.I.SimulationSpeed * simulationSpeed);
-            UpdateTimeText();
+            if (!isPaused) {
+                currentTime = currentTime.AddSeconds(Time.deltaTime * TimeIndicator.I.SimulationSpeed * simulationSpeed);
+                UpdateTimeText();
+            }
         }
 
         private void ChangeSpeed(int direction) {
             currentSpeedIndex = Mathf.Clamp(currentSpeedIndex + direction, 0, speeds.Length - 1);
-            simulationSpeed = speeds[currentSpeedIndex];
+            if (!isPaused) simulationSpeed = speeds[currentSpeedIndex];
             UpdateSpeedText();
+            UpdateButtonStates();
+        }
+
+        private void TogglePlayPause() {
+            isPaused = !isPaused;
+            simulationSpeed = isPaused ? 0f : speeds[currentSpeedIndex];
             UpdateButtonStates();
         }
 
@@ -52,6 +63,7 @@ namespace UI.TimeIndicator {
         private void UpdateButtonStates() {
             slowerButton.interactable = currentSpeedIndex > 0;
             fasterButton.interactable = currentSpeedIndex < speeds.Length - 1;
+            playPauseButton.GetComponentInChildren<TextMeshProUGUI>().text = isPaused ? "Play" : "Pause";
         }
 
         private void InitializeTime() {
