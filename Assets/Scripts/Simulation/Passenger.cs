@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Map.DataRepresentation;
+using UI.TimeIndicator;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Simulation {
     public class Passenger : MonoBehaviour {
@@ -12,7 +12,7 @@ namespace Simulation {
         [SerializeField] private MeshRenderer capsule;
 
         private void FixedUpdate() {
-            waitingTime += Time.deltaTime;
+            waitingTime += Time.deltaTime * TimeIndicator.I.SimulationSpeed;
         }
 
         public void SetDestination(StopGroup newDestination) {

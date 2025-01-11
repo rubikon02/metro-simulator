@@ -1,6 +1,7 @@
 using System.Linq;
 using Map;
 using Map.DataRepresentation;
+using UI.TimeIndicator;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -11,7 +12,7 @@ namespace Simulation {
         // private bool generateOnlyOne = false;
 
         private void Start() {
-            InvokeRepeating(nameof(GeneratePassenger), 0, spawnInterval);
+            InvokeRepeating(nameof(GeneratePassenger), 0, spawnInterval / TimeIndicator.I.SimulationSpeed);
         }
 
         private void GeneratePassenger() {

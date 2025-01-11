@@ -4,6 +4,7 @@ using System.ComponentModel;
 using UnityEngine;
 using Map.DataRepresentation;
 using System.Linq;
+using UI.TimeIndicator;
 
 namespace Simulation {
     public class Vehicle : MonoBehaviour {
@@ -38,7 +39,7 @@ namespace Simulation {
 
         private void UpdatePosition() {
             Vector3 targetPosition = pathPositions[targetPositionIndex];
-            float step = speed * Time.deltaTime;
+            float step = speed * Time.deltaTime * TimeIndicator.I.SimulationSpeed;
             float distanceToTarget = Vector3.Distance(transform.position, targetPosition);
 
             while (distanceToTarget <= step) {
@@ -59,7 +60,7 @@ namespace Simulation {
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
             var movement = targetPosition - transform.position;
             if (movement == Vector3.zero) return;
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), speed * rotationSpeedRatio * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), speed * rotationSpeedRatio * Time.deltaTime * TimeIndicator.I.SimulationSpeed);
         }
 
         private void OnTriggerEnter(Collider other) {
