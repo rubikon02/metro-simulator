@@ -36,9 +36,7 @@ namespace Simulation {
         }
 
         public void RemoveTransfer() {
-            if (transfers.Count == 0) {
-                Debug.Log(gameObject);
-            }
+            if (transfers.Count == 0) return;
             transfers.RemoveAt(0);
         }
 

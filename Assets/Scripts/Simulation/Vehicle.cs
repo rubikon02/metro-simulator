@@ -112,10 +112,10 @@ namespace Simulation {
         private IEnumerator DropOffPassengers() {
             List<Passenger> passengersToDropOff = passengers.FindAll(p => p.GetCurrentTransferStop() == currentStopGroup);
             while (passengersToDropOff.Count > 0) {
-                var passenger = passengersToDropOff[0];
+                var passenger = passengersToDropOff.First();
                 passengers.Remove(passenger);
                 currentStopGroup.AddPassenger(passenger);
-                passengersToDropOff.RemoveAt(0);
+                passengersToDropOff.Remove(passenger);
                 passenger.RemoveTransfer();
 
                 if(passenger.GetDestination() == currentStopGroup) {
