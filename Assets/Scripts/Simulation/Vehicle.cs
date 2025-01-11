@@ -57,7 +57,9 @@ namespace Simulation {
             }
 
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetPosition - transform.position), speed * rotationSpeedRatio * Time.deltaTime);
+            var movement = targetPosition - transform.position;
+            if (movement == Vector3.zero) return;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(movement), speed * rotationSpeedRatio * Time.deltaTime);
         }
 
         private void OnTriggerEnter(Collider other) {
