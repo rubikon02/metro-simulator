@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 using Map.DataRepresentation;
 using System.Linq;
@@ -8,7 +9,8 @@ namespace Simulation {
     public class Vehicle : MonoBehaviour {
         public LineDirection direction;
         public float speed = 5f;
-        public float rotationSpeed = 0.5f;
+        [Description("Rotation speed in relation to speed")]
+        public float rotationSpeedRatio = 0.015f;
         private List<Vector3> pathPositions;
         private int targetPositionIndex = 1;
 
@@ -55,7 +57,7 @@ namespace Simulation {
             }
 
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, step);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetPosition - transform.position), rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetPosition - transform.position), speed * rotationSpeedRatio * Time.deltaTime);
         }
 
         private void OnTriggerEnter(Collider other) {

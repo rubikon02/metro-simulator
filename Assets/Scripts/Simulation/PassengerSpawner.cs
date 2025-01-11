@@ -26,9 +26,6 @@ namespace Simulation {
                 destinationStop = GetRandomDestinationStopStrategy();
             }
 
-            Debug.Log("From: " + startStop.name);
-            Debug.Log("To: " + destinationStop.name);
-
             var transfers = MetroPathfinder.FindShortestPath(startStop, destinationStop);
             transfers.RemoveAt(0);
 
