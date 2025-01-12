@@ -10,6 +10,7 @@ namespace Simulation {
     public class Vehicle : MonoBehaviour {
         public LineDirection direction;
         public float speed = 5f;
+        public float doorOpeningTime = 5f;
         [Description("Rotation speed in relation to speed")]
         public float rotationSpeedRatio = 0.015f;
         private List<Vector3> pathPositions;
@@ -66,10 +67,20 @@ namespace Simulation {
         private void OnTriggerEnter(Collider other) {
             if (!other.gameObject.CompareTag("Stop")) return;
 
+            if (direction.name == "U1 Oberlaa – Leopoldau") {
+                Debug.Log("stop");
+            }
             stopped = true;
             currentStopGroup = other.GetComponent<Stop>().group;
-            StartCoroutine(DropOffPassengers());
-            StartCoroutine(GatherPassengers());
+            StartCoroutine(HandleStop());
+        }
+
+        private IEnumerator HandleStop() {
+            yield return TimeIndicator.WaitForSecondsScaled(doorOpeningTime);
+            yield return StartCoroutine(DropOffPassengers());
+            yield return StartCoroutine(GatherPassengers());
+            yield return TimeIndicator.WaitForSecondsScaled(doorOpeningTime);
+            stopped = false;
         }
 
         private IEnumerator GatherPassengers() {
@@ -105,11 +116,8 @@ namespace Simulation {
 
                 passenger.transform.localPosition = new Vector3(x * cellSize.x, passenger.transform.localPosition.y, z * cellSize.z);
 
-
-
                 yield return new WaitForSeconds(1f / passengerLoadingSpeed);
             }
-            stopped = false;
         }
 
         private IEnumerator DropOffPassengers() {

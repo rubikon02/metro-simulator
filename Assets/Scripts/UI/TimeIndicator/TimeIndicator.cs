@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -22,6 +23,14 @@ namespace UI.TimeIndicator {
         private DateTime currentTime;
         private float simulationSpeed = 1f;
         private bool isPaused = false;
+
+        public static IEnumerator WaitForSecondsScaled(float seconds) {
+            float elapsed = 0f;
+            while (elapsed < seconds) {
+                yield return null;
+                elapsed += Time.deltaTime * I.SimulationSpeed;
+            }
+        }
 
         private void Start() {
             slowerButton.onClick.AddListener(() => ChangeSpeed(-1));
