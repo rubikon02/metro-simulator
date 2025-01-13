@@ -77,23 +77,20 @@ namespace Simulation {
 
         private IEnumerator HandleStop() {
             yield return TimeIndicator.WaitForSecondsScaled(doorOpeningTime);
-            yield return StartCoroutine(DropOffPassengers());
-            yield return StartCoroutine(GatherPassengers());
+            DropOffPassengers();
+            GatherPassengers();
             yield return TimeIndicator.WaitForSecondsScaled(doorOpeningTime);
             stopped = false;
         }
 
-        private IEnumerator GatherPassengers() {
+        private void GatherPassengers() {
             var passengersToGather = currentStopGroup.passengers.FindAll(p => p.GetCurrentTransferDirectionId() == direction.id);
-            while (passengersToGather.Count > 0) {
-                var passenger = passengersToGather.First();
-                passengersToGather.Remove(passenger);
+            foreach (Passenger passenger in passengersToGather) {
                 currentStopGroup.passengers.Remove(passenger);
                 passengers.Add(passenger);
                 if (Config.I.physicalPassengers) {
                     GatherPhysicalPassenger(passenger);
                 }
-                yield return TimeIndicator.WaitForSecondsScaled(1f / passengerLoadingSpeed);
             }
         }
 
@@ -125,25 +122,14 @@ namespace Simulation {
             passenger.transform.localPosition = new Vector3(x * cellSize.x, passenger.transform.localPosition.y, z * cellSize.z);
         }
 
-        private IEnumerator DropOffPassengers() {
+        private void DropOffPassengers() {
             List<Passenger> passengersToDropOff = passengers.FindAll(p => p.GetCurrentTransferStop() == currentStopGroup);
-            while (passengersToDropOff.Count > 0) {
-                var passenger = passengersToDropOff.First();
+            foreach (Passenger passenger in passengersToDropOff) {
                 passengers.Remove(passenger);
                 currentStopGroup.AddPassenger(passenger);
-                passengersToDropOff.Remove(passenger);
-                // Bug: called more than once for each passenger
-                // I had to check if count is zero in RemoveTransfer and if passenger is already destroyed below
                 passenger.RemoveTransfer();
 
-                if(passenger.GetDestination() == currentStopGroup) {
-                    yield return TimeIndicator.WaitForSecondsScaled(5f);
-                    if (passenger) {
-                        Destroy(passenger.gameObject);
-                        PassengerSpawner.I.OnPassengerRemoved();
-                    }
-                }
-                yield return TimeIndicator.WaitForSecondsScaled(1f / passengerLoadingSpeed);
+                if(passenger.GetDestination() == currentStopGroup) passenger.DestroyDelayed();
             }
         }
     }

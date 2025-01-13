@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Map.DataRepresentation;
@@ -9,13 +10,7 @@ namespace Simulation {
         [SerializeField] private StopGroup destination;
         [SerializeField] private StopGroup start;
         [SerializeField] private List<Transfer> transfers;
-        [SerializeField] private float waitingTime;
         [SerializeField] private MeshRenderer capsule;
-
-        // Performance heavy
-        // private void FixedUpdate() {
-        //     waitingTime += Time.deltaTime * TimeIndicator.I.SimulationSpeed;
-        // }
 
         public void SetStart(StopGroup startStop) {
             start = startStop;
@@ -42,13 +37,21 @@ namespace Simulation {
         }
 
         public void RemoveTransfer() {
-            if (transfers.Count == 0) return;
-            Debug.Log($"{transfers.First().stop.name}, {transfers.First().direction.name}");
             transfers.RemoveAt(0);
         }
 
         public void SetColor(Color color) {
             capsule.material.color = color;
+        }
+
+        public void DestroyDelayed() {
+            StartCoroutine(DestroyDelayedCoroutine());
+        }
+
+        private IEnumerator DestroyDelayedCoroutine() {
+            yield return TimeIndicator.WaitForSecondsScaled(5f);
+            PassengerSpawner.I.OnPassengerRemoved();
+            Destroy(gameObject);
         }
     }
 }

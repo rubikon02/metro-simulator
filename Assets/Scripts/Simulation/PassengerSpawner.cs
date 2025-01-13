@@ -49,7 +49,6 @@ namespace Simulation {
             while (startStop == destinationStop) {
                 destinationStop = GetRandomDestinationStopStrategy();
             }
-            Debug.Log($"===== New passenger from {startStop.name} to {destinationStop.name} =====");
 
             var transfers = MetroPathfinder.FindShortestPath(startStop, destinationStop);
             transfers.RemoveAt(0);

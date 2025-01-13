@@ -48,5 +48,5 @@ MonoBehaviour:
   despawnedCount: 0
   existingCount: 0
   spawnSpeed: 11
-  existingPassengerLimit: 3
+  existingPassengerLimit: 0
   passengerPrefab: {fileID: 8925494243898561177, guid: 5f308ed004d945e4a92938d6035ee29b, type: 3}
