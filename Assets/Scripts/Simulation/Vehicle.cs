@@ -4,6 +4,7 @@ using System.ComponentModel;
 using UnityEngine;
 using Map.DataRepresentation;
 using System.Linq;
+using TMPro;
 using UI.TimeIndicator;
 using Unity.VisualScripting;
 using Utils;
@@ -22,6 +23,8 @@ namespace Simulation {
         [SerializeField] private float passengerLoadingSpeed = 2f;
         private StopGroup currentStopGroup;
         [SerializeField] private GameObject passengersContainer;
+        [SerializeField] private GameObject passengerCountersContainer;
+        [SerializeField] private List<TextMeshProUGUI> passengerCounterTexts;
         [SerializeField] private List<Passenger> passengers = new();
 
         private void Start() {
@@ -30,6 +33,7 @@ namespace Simulation {
             pathPositions = direction.path.GetPositions();
             transform.position = pathPositions[0];
             transform.LookAt(pathPositions[1]);
+            passengerCounterTexts = new List<TextMeshProUGUI>(passengerCountersContainer.GetComponentsInChildren<TextMeshProUGUI>());
         }
 
         private void FixedUpdate() {
@@ -79,6 +83,7 @@ namespace Simulation {
             yield return TimeIndicator.WaitForSecondsScaled(doorOpeningTime);
             DropOffPassengers();
             GatherPassengers();
+            UpdateTexts();
             yield return TimeIndicator.WaitForSecondsScaled(doorOpeningTime);
             stopped = false;
         }
@@ -86,7 +91,7 @@ namespace Simulation {
         private void GatherPassengers() {
             var passengersToGather = currentStopGroup.passengers.FindAll(p => p.GetCurrentTransferDirectionId() == direction.id);
             foreach (Passenger passenger in passengersToGather) {
-                currentStopGroup.passengers.Remove(passenger);
+                currentStopGroup.RemovePassenger(passenger);
                 passengers.Add(passenger);
                 if (Config.I.physicalPassengers) {
                     GatherPhysicalPassenger(passenger);
@@ -129,7 +134,16 @@ namespace Simulation {
                 currentStopGroup.AddPassenger(passenger);
                 passenger.RemoveTransfer();
 
-                if(passenger.GetDestination() == currentStopGroup) passenger.DestroyDelayed();
+                if (passenger.GetDestination() == currentStopGroup) {
+                    currentStopGroup.RemovePassenger(passenger);
+                    passenger.DestroyDelayed();
+                }
+            }
+        }
+
+        private void UpdateTexts() {
+            foreach (var text in passengerCounterTexts) {
+                text.text = passengers.Count.ToString();
             }
         }
     }

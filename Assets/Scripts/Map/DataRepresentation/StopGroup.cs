@@ -13,6 +13,7 @@ namespace Map.DataRepresentation {
         [Header("Components")]
         [SerializeField] private GameObject passengersContainer;
         [SerializeField] private TextMeshProUGUI nameText;
+        [SerializeField] private TextMeshProUGUI countText;
 
         public void SetName(string stopName) {
             name = stopName;
@@ -37,9 +38,15 @@ namespace Map.DataRepresentation {
 
         public void AddPassenger(Passenger passenger) {
             passengers.Add(passenger);
+            UpdateCountText();
             if (Config.I.physicalPassengers) {
                 AddPhysicalPassenger(passenger);
             }
+        }
+
+        public void RemovePassenger(Passenger passenger) {
+            passengers.Remove(passenger);
+            UpdateCountText();
         }
 
         /// <summary>
@@ -76,6 +83,10 @@ namespace Map.DataRepresentation {
 
         public List<SubwayLine> GetSubwayLines() {
             return stops.Select(stop => stop.GetSubwayLine()).Distinct().ToList();
+        }
+
+        private void UpdateCountText() {
+            countText.text = passengers.Count.ToString();
         }
     }
 }
