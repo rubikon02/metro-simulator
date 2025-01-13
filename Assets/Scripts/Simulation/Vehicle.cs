@@ -20,7 +20,6 @@ namespace Simulation {
         private int targetPositionIndex = 1;
 
         private bool stopped;
-        [SerializeField] private float passengerLoadingSpeed = 2f;
         private StopGroup currentStopGroup;
         [SerializeField] private GameObject passengersContainer;
         [SerializeField] private GameObject passengerCountersContainer;
