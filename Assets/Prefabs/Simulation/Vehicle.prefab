@@ -432,6 +432,7 @@ MonoBehaviour:
   speed: 22
   doorOpeningTime: 5
   rotationSpeedRatio: 0.015
+  passengerLoadingSpeed: 200
   passengersContainer: {fileID: 5432400996337773480}
   passengers: []
 --- !u!135 &3202547851048810884

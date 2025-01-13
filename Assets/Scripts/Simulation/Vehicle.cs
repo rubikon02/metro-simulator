@@ -5,19 +5,21 @@ using UnityEngine;
 using Map.DataRepresentation;
 using System.Linq;
 using UI.TimeIndicator;
+using Unity.VisualScripting;
+using Utils;
 
 namespace Simulation {
     public class Vehicle : MonoBehaviour {
         public LineDirection direction;
         public float speed = 5f;
         public float doorOpeningTime = 5f;
-        [Description("Rotation speed in relation to speed")]
+        [Tooltip("Rotation speed in relation to speed")]
         public float rotationSpeedRatio = 0.015f;
         private List<Vector3> pathPositions;
         private int targetPositionIndex = 1;
 
         private bool stopped;
-        private float passengerLoadingSpeed = 2f;
+        [SerializeField] private float passengerLoadingSpeed = 2f;
         private StopGroup currentStopGroup;
         [SerializeField] private GameObject passengersContainer;
         [SerializeField] private List<Passenger> passengers = new();
@@ -51,6 +53,7 @@ namespace Simulation {
                     direction = direction.oppositeDirection;
                     pathPositions = direction.path.GetPositions();
                     transform.rotation = Quaternion.LookRotation(pathPositions[1] - pathPositions[0]);
+                    StartCoroutine(HandleStop());
                 } else {
                     step -= distanceToTarget;
                 }
@@ -67,9 +70,6 @@ namespace Simulation {
         private void OnTriggerEnter(Collider other) {
             if (!other.gameObject.CompareTag("Stop")) return;
 
-            if (direction.name == "U1 Oberlaa – Leopoldau") {
-                Debug.Log("stop");
-            }
             stopped = true;
             currentStopGroup = other.GetComponent<Stop>().group;
             StartCoroutine(HandleStop());
@@ -90,34 +90,39 @@ namespace Simulation {
                 passengersToGather.Remove(passenger);
                 currentStopGroup.passengers.Remove(passenger);
                 passengers.Add(passenger);
-
-                var cellSize = passenger.gameObject.GetComponentInChildren<Renderer>().bounds.size;
-                passenger.transform.parent = passengersContainer.transform;
-
-                int n = passengers.Count;
-                int k = Mathf.CeilToInt((Mathf.Sqrt(n) - 1) / 2);
-                int m = 2 * k + 1;
-                int p = n - (m - 2) * (m - 2);
-
-                int x = 0, z = 0;
-                if (p <= m - 1) {
-                    x = k;
-                    z = -k + p;
-                } else if (p <= 2 * (m - 1)) {
-                    x = k - (p - (m - 1));
-                    z = k;
-                } else if (p <= 3 * (m - 1)) {
-                    x = -k;
-                    z = k - (p - 2 * (m - 1));
-                } else {
-                    x = -k + (p - 3 * (m - 1));
-                    z = -k;
+                if (Config.I.physicalPassengers) {
+                    GatherPhysicalPassenger(passenger);
                 }
-
-                passenger.transform.localPosition = new Vector3(x * cellSize.x, passenger.transform.localPosition.y, z * cellSize.z);
-
-                yield return new WaitForSeconds(1f / passengerLoadingSpeed);
+                yield return TimeIndicator.WaitForSecondsScaled(1f / passengerLoadingSpeed);
             }
+        }
+
+        private void GatherPhysicalPassenger(Passenger passenger) {
+            passenger.transform.parent = passengersContainer.transform;
+
+            var cellSize = passenger.gameObject.GetComponentInChildren<Renderer>().bounds.size;
+
+            int n = passengers.Count;
+            int k = Mathf.CeilToInt((Mathf.Sqrt(n) - 1) / 2);
+            int m = 2 * k + 1;
+            int p = n - (m - 2) * (m - 2);
+
+            int x = 0, z = 0;
+            if (p <= m - 1) {
+                x = k;
+                z = -k + p;
+            } else if (p <= 2 * (m - 1)) {
+                x = k - (p - (m - 1));
+                z = k;
+            } else if (p <= 3 * (m - 1)) {
+                x = -k;
+                z = k - (p - 2 * (m - 1));
+            } else {
+                x = -k + (p - 3 * (m - 1));
+                z = -k;
+            }
+
+            passenger.transform.localPosition = new Vector3(x * cellSize.x, passenger.transform.localPosition.y, z * cellSize.z);
         }
 
         private IEnumerator DropOffPassengers() {
@@ -127,14 +132,18 @@ namespace Simulation {
                 passengers.Remove(passenger);
                 currentStopGroup.AddPassenger(passenger);
                 passengersToDropOff.Remove(passenger);
+                // Bug: called more than once for each passenger
+                // I had to check if count is zero in RemoveTransfer and if passenger is already destroyed below
                 passenger.RemoveTransfer();
 
                 if(passenger.GetDestination() == currentStopGroup) {
-                    passenger.SetColor(Color.gray);
-                    yield return new WaitForSeconds(5f);
-                    passenger.gameObject.SetActive(false);
+                    yield return TimeIndicator.WaitForSecondsScaled(5f);
+                    if (passenger) {
+                        Destroy(passenger.gameObject);
+                        PassengerSpawner.I.OnPassengerRemoved();
+                    }
                 }
-                yield return new WaitForSeconds(1f / passengerLoadingSpeed);
+                yield return TimeIndicator.WaitForSecondsScaled(1f / passengerLoadingSpeed);
             }
         }
     }

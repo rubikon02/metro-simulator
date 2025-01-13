@@ -17,7 +17,7 @@ namespace UI.TimeIndicator {
         [SerializeField] private Button fasterButton;
         [SerializeField] private Button playPauseButton;
 
-        private readonly DateTime startTime = DateTime.Today.AddHours(8);
+        private readonly DateTime startTime = DateTime.Today.AddHours(5);
         private readonly float[] speeds = { 0.1f, 0.25f, 0.5f, 1f, 2f, 4f, 8f, 16f, 32f, 64f };
         private int currentSpeedIndex = 3;
         private DateTime currentTime;

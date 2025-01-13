@@ -3,6 +3,7 @@ using System.Linq;
 using Simulation;
 using TMPro;
 using UnityEngine;
+using Utils;
 
 namespace Map.DataRepresentation {
     public class StopGroup : MonoBehaviour {
@@ -34,14 +35,21 @@ namespace Map.DataRepresentation {
             stop.SetGroup(this);
         }
 
+        public void AddPassenger(Passenger passenger) {
+            passengers.Add(passenger);
+            if (Config.I.physicalPassengers) {
+                AddPhysicalPassenger(passenger);
+            }
+        }
+
         /// <summary>
         /// Adds new passenger standing at the stop in the square shape
         /// </summary>
         /// <param name="passenger"></param>
-        public void AddPassenger(Passenger passenger) {
-            passengers.Add(passenger);
-            var cellSize = passenger.gameObject.GetComponentInChildren<Renderer>().bounds.size;
+        private void AddPhysicalPassenger(Passenger passenger) {
             passenger.transform.parent = passengersContainer.transform;
+
+            var cellSize = passenger.gameObject.GetComponentInChildren<Renderer>().bounds.size;
 
             int n = passengers.Count;
             int k = Mathf.CeilToInt((Mathf.Sqrt(n) - 1) / 2);

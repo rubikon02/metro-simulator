@@ -7,12 +7,18 @@ using UnityEngine;
 namespace Simulation {
     public class Passenger : MonoBehaviour {
         [SerializeField] private StopGroup destination;
+        [SerializeField] private StopGroup start;
         [SerializeField] private List<Transfer> transfers;
         [SerializeField] private float waitingTime;
         [SerializeField] private MeshRenderer capsule;
 
-        private void FixedUpdate() {
-            waitingTime += Time.deltaTime * TimeIndicator.I.SimulationSpeed;
+        // Performance heavy
+        // private void FixedUpdate() {
+        //     waitingTime += Time.deltaTime * TimeIndicator.I.SimulationSpeed;
+        // }
+
+        public void SetStart(StopGroup startStop) {
+            start = startStop;
         }
 
         public void SetDestination(StopGroup newDestination) {
@@ -28,7 +34,7 @@ namespace Simulation {
         }
 
         public StopGroup GetCurrentTransferStop() {
-            return transfers.FirstOrDefault()?.stop ?? null;
+            return transfers.FirstOrDefault()?.stop;
         }
 
         public int GetCurrentTransferDirectionId() {
@@ -37,6 +43,7 @@ namespace Simulation {
 
         public void RemoveTransfer() {
             if (transfers.Count == 0) return;
+            Debug.Log($"{transfers.First().stop.name}, {transfers.First().direction.name}");
             transfers.RemoveAt(0);
         }
 

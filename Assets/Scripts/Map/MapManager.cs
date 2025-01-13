@@ -25,6 +25,7 @@ namespace Map {
             SubwayLineGenerator.I.SetStopGroupNames(osmStopsData);
             SubwayLineGenerator.I.ConnectOppositeDirections();
             VehicleSpawner.I.StartSpawning();
+            PassengerSpawner.I.StartSpawning();
         }
     }
 }
