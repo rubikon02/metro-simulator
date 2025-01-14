@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Map.DataRepresentation;
-using UI.TimeIndicator;
+using UI;
 using UnityEngine;
 
 namespace Simulation {

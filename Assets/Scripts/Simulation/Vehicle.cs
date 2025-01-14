@@ -1,12 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using Map.DataRepresentation;
-using System.Linq;
 using TMPro;
-using UI.TimeIndicator;
-using Unity.VisualScripting;
+using UI;
 using Utils;
 
 namespace Simulation {
@@ -18,13 +15,22 @@ namespace Simulation {
         public float rotationSpeedRatio = 0.015f;
         private List<Vector3> pathPositions;
         private int targetPositionIndex = 1;
+        public static int maxPassengerCount;
 
         private bool stopped;
         private StopGroup currentStopGroup;
         [SerializeField] private GameObject passengersContainer;
         [SerializeField] private GameObject passengerCountersContainer;
+        [SerializeField] private GameObject passengerPlatform;
+        [SerializeField] private GameObject passengerPrefab;
         [SerializeField] private List<TextMeshProUGUI> passengerCounterTexts;
         [SerializeField] private List<Passenger> passengers = new();
+
+        private Vector3 cellSize;
+        private int gridWidth;
+        private int gridHeight;
+        private Vector3 platformSize;
+        private float xOffsetToCenter;
 
         private void Start() {
             if (direction == null || direction.path == null) return;
@@ -32,8 +38,21 @@ namespace Simulation {
             pathPositions = direction.path.GetPositions();
             transform.position = pathPositions[0];
             transform.LookAt(pathPositions[1]);
-            passengerCounterTexts = new List<TextMeshProUGUI>(passengerCountersContainer.GetComponentsInChildren<TextMeshProUGUI>());
+            passengerCounterTexts =
+                new List<TextMeshProUGUI>(passengerCountersContainer.GetComponentsInChildren<TextMeshProUGUI>());
+
+            // Calculate the grid size based on the passenger platform size and passenger size
+            cellSize = passengerPrefab.GetComponentInChildren<Renderer>().bounds.size;
+            platformSize = passengerPlatform.transform.localScale * 10; // default plane is 10x10
+            gridWidth = Mathf.FloorToInt(platformSize.x / cellSize.x);
+            gridHeight = Mathf.FloorToInt(platformSize.z / cellSize.z);
+            Debug.Log($"Grid size: {gridWidth}x{gridHeight} - platform scale {platformSize.x}x{platformSize.z} - cell size {cellSize.x}x{cellSize.z}");
+            xOffsetToCenter = (platformSize.x - (gridWidth * cellSize.x)) / 2;
         }
+
+        // private void OnDrawGizmos() {
+        //     Debug.Log(passengerPlatform.GetComponent<Renderer>().bounds.size);
+        // }
 
         private void FixedUpdate() {
             if (pathPositions == null || pathPositions.Count == 0) return;
@@ -103,29 +122,16 @@ namespace Simulation {
         private void GatherPhysicalPassenger(Passenger passenger) {
             passenger.transform.parent = passengersContainer.transform;
 
-            var cellSize = passenger.gameObject.GetComponentInChildren<Renderer>().bounds.size;
+            int index = passengers.Count - 1;
+            int x = index % gridWidth;
+            int z = index / gridWidth;
 
-            int n = passengers.Count;
-            int k = Mathf.CeilToInt((Mathf.Sqrt(n) - 1) / 2);
-            int m = 2 * k + 1;
-            int p = n - (m - 2) * (m - 2);
 
-            int x = 0, z = 0;
-            if (p <= m - 1) {
-                x = k;
-                z = -k + p;
-            } else if (p <= 2 * (m - 1)) {
-                x = k - (p - (m - 1));
-                z = k;
-            } else if (p <= 3 * (m - 1)) {
-                x = -k;
-                z = k - (p - 2 * (m - 1));
-            } else {
-                x = -k + (p - 3 * (m - 1));
-                z = -k;
-            }
-
-            passenger.transform.localPosition = new Vector3(x * cellSize.x, passenger.transform.localPosition.y, z * cellSize.z);
+            passenger.transform.localPosition = new Vector3(
+                x * cellSize.x - (platformSize.x / 2) + cellSize.x / 2 + xOffsetToCenter,
+                0,
+                -(z * cellSize.z - (platformSize.z / 2) + cellSize.z / 2)
+            );
         }
 
         private void DropOffPassengers() {
@@ -140,12 +146,31 @@ namespace Simulation {
                     passenger.DestroyDelayed();
                 }
             }
+            if (Config.I.physicalPassengers) ReorderPassengers();
+        }
+
+        private void ReorderPassengers() {
+            for (int i = 0; i < passengers.Count; i++) {
+                int x = i % gridWidth;
+                int z = i / gridWidth;
+
+                passengers[i].transform.localPosition = new Vector3(
+                    x * cellSize.x - (platformSize.x / 2) + cellSize.x / 2 + xOffsetToCenter,
+                    0,
+                    -(z * cellSize.z - (platformSize.z / 2) + cellSize.z / 2)
+                );
+            }
         }
 
         private void UpdateTexts() {
             foreach (var text in passengerCounterTexts) {
                 text.text = passengers.Count.ToString();
             }
+
+            if (passengers.Count > maxPassengerCount) {
+                Debug.Log(passengers.Count);
+            }
+            maxPassengerCount = Mathf.Max(maxPassengerCount, passengers.Count);
         }
     }
 }

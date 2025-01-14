@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Utils;
 
-namespace UI.TimeIndicator {
+namespace UI {
     public class TimeIndicator : MonoSingleton<TimeIndicator> {
         public DateTime CurrentTime => currentTime;
         public float SimulationSpeed => simulationSpeed;
@@ -19,9 +19,9 @@ namespace UI.TimeIndicator {
 
         private readonly DateTime startTime = DateTime.Today.AddHours(5);
         private readonly float[] speeds = { 0.1f, 0.25f, 0.5f, 1f, 2f, 4f, 8f, 16f, 32f, 64f };
-        private int currentSpeedIndex = 3;
+        private int currentSpeedIndex = 9;
         private DateTime currentTime;
-        private float simulationSpeed = 1f;
+        private float simulationSpeed = 64f;
         private bool isPaused = false;
 
         public static IEnumerator WaitForSecondsScaled(float seconds) {

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Linq;
 using Map;
 using Map.DataRepresentation;
-using UI.TimeIndicator;
+using UI;
 using UnityEngine;
 using Utils;
 using Random = UnityEngine.Random;
