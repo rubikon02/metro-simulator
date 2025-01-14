@@ -44,8 +44,18 @@ namespace Map.DataRepresentation {
             }
         }
 
-        public void RemovePassenger(Passenger passenger) {
-            passengers.Remove(passenger);
+        public void AddPassengers(List<Passenger> passengersToAdd) {
+            passengers.AddRange(passengersToAdd);
+            if (Config.I.physicalPassengers) {
+                foreach (Passenger passenger in passengersToAdd) {
+                    AddPhysicalPassenger(passenger);
+                }
+            }
+            UpdateCountText();
+        }
+
+        public void RemovePassengers(IEnumerable<Passenger> passengersToRemove) {
+            passengers = passengers.Except(passengersToRemove).ToList();
             UpdateCountText();
         }
 

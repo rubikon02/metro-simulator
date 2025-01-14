@@ -16,13 +16,14 @@ namespace Simulation {
         [Header("Settings")]
         [Tooltip("People per second")]
         [SerializeField] private float spawnSpeed = 100f;
+        [SerializeField] private float spawnInterval = 10f;
         [SerializeField] private int existingPassengerLimit = 1;
         [Header("Prefabs")]
         [SerializeField] private Passenger passengerPrefab;
 
-        public void OnPassengerRemoved() {
-            despawnedCount++;
-            existingCount--;
+        public void OnPassengerRemoved(int count = 1) {
+            despawnedCount += count;
+            existingCount -= count;
         }
 
         public void StartSpawning() {
@@ -31,10 +32,10 @@ namespace Simulation {
 
         private IEnumerator SpawnPassengers() {
             while (true) {
-                for (int i = 0; i < spawnSpeed; i++) {
+                for (int i = 0; i < spawnSpeed * spawnInterval; i++) {
                     GeneratePassenger();
                 }
-                yield return TimeIndicator.WaitForSecondsScaled(1f);
+                yield return TimeIndicator.WaitForSecondsScaled(spawnInterval);
             }
         }
 
@@ -57,7 +58,7 @@ namespace Simulation {
             passenger.SetStart(startStop);
             passenger.SetDestination(destinationStop);
             passenger.SetTransfers(transfers);
-            passenger.SetColor(Color.magenta);
+            passenger.enabled = Config.I.physicalPassengers;
             startStop.AddPassenger(passenger);
             spawnedCount++;
             existingCount++;

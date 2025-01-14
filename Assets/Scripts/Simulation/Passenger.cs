@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Map.DataRepresentation;
-using UI;
 using UnityEngine;
 
 namespace Simulation {
@@ -10,7 +7,6 @@ namespace Simulation {
         [SerializeField] private StopGroup destination;
         [SerializeField] private StopGroup start;
         [SerializeField] private List<Transfer> transfers;
-        [SerializeField] private MeshRenderer capsule;
         [SerializeField] private Renderer renderer;
         public Vector3 Size => renderer.bounds.size;
 
@@ -23,7 +19,7 @@ namespace Simulation {
         }
 
         public void SetTransfers(List<Transfer> newTransfers) {
-            transfers = new List<Transfer>(newTransfers);
+            transfers = newTransfers;
         }
 
         public StopGroup GetDestination() {
@@ -31,29 +27,15 @@ namespace Simulation {
         }
 
         public StopGroup GetCurrentTransferStop() {
-            return transfers.FirstOrDefault()?.stop;
+            return transfers[0].stop;
         }
 
         public int GetCurrentTransferDirectionId() {
-            return transfers.FirstOrDefault()?.direction.id ?? -1;
+            return transfers[0].direction.id;
         }
 
         public void RemoveTransfer() {
             transfers.RemoveAt(0);
-        }
-
-        public void SetColor(Color color) {
-            capsule.material.color = color;
-        }
-
-        public void DestroyDelayed() {
-            StartCoroutine(DestroyDelayedCoroutine());
-        }
-
-        private IEnumerator DestroyDelayedCoroutine() {
-            yield return TimeIndicator.WaitForSecondsScaled(5f);
-            PassengerSpawner.I.OnPassengerRemoved();
-            Destroy(gameObject);
         }
     }
 }

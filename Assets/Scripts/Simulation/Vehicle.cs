@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Map.DataRepresentation;
 using TMPro;
@@ -111,56 +112,62 @@ namespace Simulation {
 
         private void GatherPassengers() {
             var passengersToGather = currentStopGroup.passengers.FindAll(p => p.GetCurrentTransferDirectionId() == direction.id);
-            foreach (Passenger passenger in passengersToGather) {
-                currentStopGroup.RemovePassenger(passenger);
-                passengers.Add(passenger);
-                if (Config.I.physicalPassengers) {
-                    GatherPhysicalPassenger(passenger);
-                }
+            var count = passengersToGather.Count;
+            passengers.AddRange(passengersToGather);
+            if (count != passengersToGather.Count) Debug.LogError("Passenger count mismatch");
+            currentStopGroup.RemovePassengers(passengersToGather);
+            if (count != passengersToGather.Count) Debug.LogError("Passenger count mismatch");
+            if (Config.I.physicalPassengers) {
+                GatherPhysicalPassengers(passengersToGather);
+            if (count != passengersToGather.Count) Debug.LogError("Passenger count mismatch");
             }
         }
 
-        private void GatherPhysicalPassenger(Passenger passenger) {
-            passenger.transform.parent = passengersContainer.transform;
+        private void GatherPhysicalPassengers(List<Passenger> passengersToGather) {
+            for (int i = 0; i < passengersToGather.Count; i++) {
+                passengersToGather[i].transform.parent = passengersContainer.transform;
 
-            int index = passengers.Count - 1;
-            int x = index % gridWidth;
-            int z = index / gridWidth;
-
-
-            passenger.transform.localPosition = new Vector3(
-                x * cellSize.x - halfPlatformSize.x + halfCellSize.x + xOffsetToCenter,
-                0,
-                -(z * cellSize.z - halfPlatformSize.z + halfCellSize.z)
-            );
+                int index = passengers.Count - passengersToGather.Count + i;
+                SetPassengerGridPosition(index);
+            }
         }
 
         private void DropOffPassengers() {
             List<Passenger> passengersToDropOff = passengers.FindAll(p => p.GetCurrentTransferStop() == currentStopGroup);
+            List<Passenger> passengersAtFinalDestination = passengers.FindAll(p => p.GetDestination() == currentStopGroup);
+            // Debug.Log($"Removing {passengersAtFinalDestination.Count} passengers");
+            var count = passengersToDropOff.Count;
             foreach (Passenger passenger in passengersToDropOff) {
                 passengers.Remove(passenger);
-                currentStopGroup.AddPassenger(passenger);
                 passenger.RemoveTransfer();
-
-                if (passenger.GetDestination() == currentStopGroup) {
-                    currentStopGroup.RemovePassenger(passenger);
-                    passenger.DestroyDelayed();
-                }
             }
+            if (count != passengersToDropOff.Count) Debug.LogError("Passenger count mismatch");
+            // currentStopGroup.AddPassengers(passengersToDropOff);
+            RemoveBatch(passengersAtFinalDestination);
             if (Config.I.physicalPassengers) ReorderPassengers();
+        }
+
+        private void RemoveBatch(List<Passenger> passengersToRemove) {
+            // yield return TimeIndicator.WaitForSecondsScaled(5f);
+            PassengerSpawner.I.OnPassengerRemoved(passengersToRemove.Count);
+            foreach (Passenger passenger in passengersToRemove) Destroy(passenger.gameObject);
         }
 
         private void ReorderPassengers() {
             for (int i = 0; i < passengers.Count; i++) {
-                int x = i % gridWidth;
-                int z = i / gridWidth;
-
-                passengers[i].transform.localPosition = new Vector3(
-                    x * cellSize.x - halfPlatformSize.x + halfCellSize.x + xOffsetToCenter,
-                    0,
-                    -(z * cellSize.z - halfPlatformSize.z + halfCellSize.z)
-                );
+                SetPassengerGridPosition(i);
             }
+        }
+
+        private void SetPassengerGridPosition(int passengerIndex) {
+            int x = passengerIndex % gridWidth;
+            int z = passengerIndex / gridWidth;
+
+            passengers[passengerIndex].transform.localPosition = new Vector3(
+                x * cellSize.x - halfPlatformSize.x + halfCellSize.x + xOffsetToCenter,
+                0,
+                -(z * cellSize.z - halfPlatformSize.z + halfCellSize.z)
+            );
         }
 
         private void UpdateTexts() {
