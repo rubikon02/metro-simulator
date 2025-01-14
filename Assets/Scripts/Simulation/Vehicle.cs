@@ -73,8 +73,10 @@ namespace Simulation {
         private void OnTriggerEnter(Collider other) {
             if (!other.gameObject.CompareTag("Stop")) return;
 
+            var newStopGroup = other.GetComponent<Stop>().group;
+            if (newStopGroup == currentStopGroup) return;
             stopped = true;
-            currentStopGroup = other.GetComponent<Stop>().group;
+            currentStopGroup = newStopGroup;
             StartCoroutine(HandleStop());
         }
 
