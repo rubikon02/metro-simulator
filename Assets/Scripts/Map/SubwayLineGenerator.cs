@@ -33,6 +33,9 @@ namespace Map {
 
 
             foreach (var element in osmData.Elements) {
+                if (lineExclude.Contains(element.Tags.Name)) {
+                    continue;
+                }
                 var lineDirection = Instantiate(
                     lineDirectionPrefab,
                     MapManager.WorldPosition(element.Bounds.Center),
@@ -187,8 +190,8 @@ namespace Map {
         private readonly Dictionary<string, Color> lineColors = new() {
             { "U1 Oberlaa – Leopoldau", Color.green },
             { "U1 Leopoldau – Oberlaa", Color.green },
-            { "U2 Schottentor – Aspernstraße", Color.clear },
-            { "U2 Aspernstraße – Schottentor", Color.clear },
+            // { "U2 Schottentor – Aspernstraße", Color.clear },
+            // { "U2 Aspernstraße – Schottentor", Color.clear },
             { "U2 Schottentor – Seestadt", Color.red },
             { "U2 Seestadt – Schottentor", Color.red },
             { "U3 Ottakring – Simmering", Color.yellow },
@@ -197,6 +200,11 @@ namespace Map {
             { "U4 Heiligenstadt – Hütteldorf", Color.blue },
             { "U6 Siebenhirten – Floridsdorf", Color.cyan },
             { "U6 Floridsdorf – Siebenhirten", Color.cyan },
+        };
+
+        private readonly List<string> lineExclude = new() {
+            "U2 Schottentor – Aspernstraße",
+            "U2 Aspernstraße – Schottentor",
         };
     }
 }
