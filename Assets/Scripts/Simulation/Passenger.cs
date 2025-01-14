@@ -11,6 +11,8 @@ namespace Simulation {
         [SerializeField] private StopGroup start;
         [SerializeField] private List<Transfer> transfers;
         [SerializeField] private MeshRenderer capsule;
+        [SerializeField] private Renderer renderer;
+        public Vector3 Size => renderer.bounds.size;
 
         public void SetStart(StopGroup startStop) {
             start = startStop;

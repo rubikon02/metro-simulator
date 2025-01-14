@@ -56,7 +56,7 @@ namespace Map.DataRepresentation {
         private void AddPhysicalPassenger(Passenger passenger) {
             passenger.transform.parent = passengersContainer.transform;
 
-            var cellSize = passenger.gameObject.GetComponentInChildren<Renderer>().bounds.size;
+            var cellSize = passenger.Size;
 
             int n = passengers.Count;
             int k = Mathf.CeilToInt((Mathf.Sqrt(n) - 1) / 2);
@@ -82,7 +82,7 @@ namespace Map.DataRepresentation {
         }
 
         public List<SubwayLine> GetSubwayLines() {
-            return stops.Select(stop => stop.GetSubwayLine()).Distinct().ToList();
+            return stops.Select(stop => stop.line).Distinct().ToList();
         }
 
         private void UpdateCountText() {

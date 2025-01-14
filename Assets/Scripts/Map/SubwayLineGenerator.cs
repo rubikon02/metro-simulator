@@ -102,6 +102,16 @@ namespace Map {
             }
         }
 
+        public void SetStopLines() {
+            foreach (var subwayLine in subwayLines) {
+                foreach (var direction in subwayLine.directions) {
+                    foreach (var stop in direction.stops) {
+                        stop.line = subwayLine;
+                    }
+                }
+            }
+        }
+
         public void ConnectOppositeDirections() {
             foreach (var subwayLine in subwayLines) {
                 foreach (var directionA in subwayLine.directions) {

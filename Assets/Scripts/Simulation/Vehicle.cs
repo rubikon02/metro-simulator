@@ -15,7 +15,6 @@ namespace Simulation {
         public float rotationSpeedRatio = 0.015f;
         private List<Vector3> pathPositions;
         private int targetPositionIndex = 1;
-        public static int maxPassengerCount;
 
         private bool stopped;
         private StopGroup currentStopGroup;
@@ -29,8 +28,9 @@ namespace Simulation {
         private Vector3 cellSize;
         private int gridWidth;
         private int gridHeight;
-        private Vector3 platformSize;
         private float xOffsetToCenter;
+        private Vector3 halfPlatformSize;
+        private Vector3 halfCellSize;
 
         private void Start() {
             if (direction == null || direction.path == null) return;
@@ -43,10 +43,11 @@ namespace Simulation {
 
             // Calculate the grid size based on the passenger platform size and passenger size
             cellSize = passengerPrefab.GetComponentInChildren<Renderer>().bounds.size;
-            platformSize = passengerPlatform.transform.localScale * 10; // default plane is 10x10
+            var platformSize = passengerPlatform.transform.localScale * 10; // default plane is 10x10
+            halfPlatformSize = platformSize / 2;
+            halfCellSize = cellSize / 2;
             gridWidth = Mathf.FloorToInt(platformSize.x / cellSize.x);
             gridHeight = Mathf.FloorToInt(platformSize.z / cellSize.z);
-            Debug.Log($"Grid size: {gridWidth}x{gridHeight} - platform scale {platformSize.x}x{platformSize.z} - cell size {cellSize.x}x{cellSize.z}");
             xOffsetToCenter = (platformSize.x - (gridWidth * cellSize.x)) / 2;
         }
 
@@ -128,9 +129,9 @@ namespace Simulation {
 
 
             passenger.transform.localPosition = new Vector3(
-                x * cellSize.x - (platformSize.x / 2) + cellSize.x / 2 + xOffsetToCenter,
+                x * cellSize.x - halfPlatformSize.x + halfCellSize.x + xOffsetToCenter,
                 0,
-                -(z * cellSize.z - (platformSize.z / 2) + cellSize.z / 2)
+                -(z * cellSize.z - halfPlatformSize.z + halfCellSize.z)
             );
         }
 
@@ -155,9 +156,9 @@ namespace Simulation {
                 int z = i / gridWidth;
 
                 passengers[i].transform.localPosition = new Vector3(
-                    x * cellSize.x - (platformSize.x / 2) + cellSize.x / 2 + xOffsetToCenter,
+                    x * cellSize.x - halfPlatformSize.x + halfCellSize.x + xOffsetToCenter,
                     0,
-                    -(z * cellSize.z - (platformSize.z / 2) + cellSize.z / 2)
+                    -(z * cellSize.z - halfPlatformSize.z + halfCellSize.z)
                 );
             }
         }
@@ -166,11 +167,6 @@ namespace Simulation {
             foreach (var text in passengerCounterTexts) {
                 text.text = passengers.Count.ToString();
             }
-
-            if (passengers.Count > maxPassengerCount) {
-                Debug.Log(passengers.Count);
-            }
-            maxPassengerCount = Mathf.Max(maxPassengerCount, passengers.Count);
         }
     }
 }

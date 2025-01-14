@@ -23,6 +23,7 @@ namespace Map {
             osmStopsData = MapFileReader.LoadStops();
             SubwayLineGenerator.I.Generate(osmData);
             SubwayLineGenerator.I.SetStopGroupNames(osmStopsData);
+            SubwayLineGenerator.I.SetStopLines();
             SubwayLineGenerator.I.ConnectOppositeDirections();
             VehicleSpawner.I.StartSpawning();
             PassengerSpawner.I.StartSpawning();

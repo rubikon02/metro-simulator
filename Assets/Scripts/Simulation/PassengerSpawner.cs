@@ -65,7 +65,7 @@ namespace Simulation {
 
         private StopGroup GetRandomStop() {
             var stops = SubwayLineGenerator.I.stopGroups;
-            if (stops.Count == 0) Debug.LogError("No stop groups found");
+            // if (stops.Count == 0) Debug.LogError("No stop groups found");
             return stops[Random.Range(0, stops.Count)];
         }
 
