@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Linq;
+using Map;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,10 +20,10 @@ namespace UI {
         [SerializeField] private Button playPauseButton;
 
         private readonly DateTime startTime = DateTime.Today.AddHours(5);
-        private readonly float[] speeds = { 0.1f, 0.25f, 0.5f, 1f, 2f, 4f, 8f, 16f, 32f, 64f };
-        private int currentSpeedIndex = 9;
+        private readonly float[] speeds = { 0.1f, 0.25f, 0.5f, 1f, 2f, 4f, 8f, 16f, 32f, 64f, 128f, 256f, 512f, 1024f };
+        private int currentSpeedIndex;
         private DateTime currentTime;
-        private float simulationSpeed = 64f;
+        private float simulationSpeed = 256f;
         private bool isPaused = false;
 
         public static IEnumerator WaitForSecondsScaled(float seconds) {
@@ -33,6 +35,8 @@ namespace UI {
         }
 
         private void Start() {
+            currentSpeedIndex = Array.IndexOf(speeds, simulationSpeed);
+            ResizeVehicleColliders();
             slowerButton.onClick.AddListener(() => ChangeSpeed(-1));
             fasterButton.onClick.AddListener(() => ChangeSpeed(1));
             playPauseButton.onClick.AddListener(TogglePlayPause);
@@ -43,16 +47,30 @@ namespace UI {
 
         private void Update() {
             if (!isPaused) {
-                currentTime = currentTime.AddSeconds(Time.deltaTime * TimeIndicator.I.SimulationSpeed * simulationSpeed);
+                currentTime = currentTime.AddSeconds(Time.deltaTime * simulationSpeed);
                 UpdateTimeText();
             }
         }
 
         private void ChangeSpeed(int direction) {
             currentSpeedIndex = Mathf.Clamp(currentSpeedIndex + direction, 0, speeds.Length - 1);
+            ResizeVehicleColliders();
             if (!isPaused) simulationSpeed = speeds[currentSpeedIndex];
             UpdateSpeedText();
             UpdateButtonStates();
+        }
+
+        private void ResizeVehicleColliders() {
+            float factor;
+            if (speeds[currentSpeedIndex] <= 256f) {
+                factor = 1;
+            } else {
+                factor = speeds[currentSpeedIndex] / 256f;
+            }
+
+            foreach (var vehicle in SubwayLineGenerator.I.subwayLines.SelectMany(line => line.vehicles)) {
+                vehicle.ResizeCollider(factor);
+            }
         }
 
         private void TogglePlayPause() {
