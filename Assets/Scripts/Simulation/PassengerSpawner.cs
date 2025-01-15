@@ -14,6 +14,7 @@ namespace Simulation {
     [Serializable]
     public class DayTrafficAmount {
         public string day;
+        public float average;
         public AnimationCurve trafficCurve = new();
     }
 
@@ -22,9 +23,11 @@ namespace Simulation {
         [SerializeField] private int spawnedCount;
         [SerializeField] private int despawnedCount;
         [SerializeField] private int existingCount;
+        [SerializeField] private float trafficIntensity;
+        [SerializeField] private float spawnSpeed;
         [Header("Settings")]
         [Tooltip("People per second")]
-        [SerializeField] private float spawnSpeed = 100f;
+        [SerializeField] private float busiestDaySpawnSpeed = 11f;
         [SerializeField] private float spawnInterval = 10f;
         [SerializeField] private int existingPassengerLimit = 1;
         [Header("Prefabs")]
@@ -69,6 +72,14 @@ namespace Simulation {
                 weekTrafficAmounts[i].trafficCurve.AddKey(nextDayKeyframe);
             }
 
+            // Adjust spawnSpeed to fractional traffic amounts
+            foreach (var dayTraffic in weekTrafficAmounts) {
+                float total = dayTraffic.trafficCurve.keys.Sum(key => key.value);
+                dayTraffic.average = total / dayTraffic.trafficCurve.length;
+            }
+            float busiestDayAverage = weekTrafficAmounts.Max(d => d.average);
+            spawnSpeed = busiestDaySpawnSpeed / busiestDayAverage;
+
             // Smooth the curve
             foreach (var dayTraffic in weekTrafficAmounts) {
                 // General smooth
@@ -107,14 +118,25 @@ namespace Simulation {
             }
         }
 
-        private IEnumerator SpawnPassengers() {
-            while (true) {
-                for (int i = 0; i < spawnSpeed * spawnInterval; i++) {
+    private IEnumerator SpawnPassengers() {
+        while (true) {
+            var day = TimeIndicator.I.CurrentTime.DayOfWeek;
+            var currentTime = TimeIndicator.I.CurrentTime;
+            var dayTraffic = weekTrafficAmounts.FirstOrDefault(d => d.day == day.ToString());
+
+            if (dayTraffic != null) {
+                float timeInHours = currentTime.Hour + currentTime.Minute / 60f;
+                trafficIntensity = dayTraffic.trafficCurve.Evaluate(timeInHours);
+
+                float batchSize = spawnSpeed * spawnInterval * trafficIntensity;
+                for (int i = 0; i < batchSize; i++) {
                     GeneratePassenger();
                 }
-                yield return TimeIndicator.WaitForSecondsScaled(spawnInterval);
             }
+
+            yield return TimeIndicator.WaitForSecondsScaled(spawnInterval);
         }
+    }
 
         private void GeneratePassenger() {
             if(existingPassengerLimit > 0 && existingCount >= existingPassengerLimit) return;
