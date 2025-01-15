@@ -30,6 +30,14 @@ namespace Simulation {
             StartCoroutine(SpawnPassengers());
         }
 
+        public int GetExistingCount() {
+            return existingCount;
+        }
+
+        public int GetDespawnedCount() {
+            return despawnedCount;
+        }
+
         private IEnumerator SpawnPassengers() {
             while (true) {
                 for (int i = 0; i < spawnSpeed * spawnInterval; i++) {
