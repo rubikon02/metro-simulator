@@ -112,21 +112,17 @@ namespace Simulation {
 
         private void GatherPassengers() {
             var passengersToGather = currentStopGroup.passengers.FindAll(p => p.GetCurrentTransferDirectionId() == direction.id);
-            var count = passengersToGather.Count;
+            if (passengersToGather.Count == 0) return;
             passengers.AddRange(passengersToGather);
-            if (count != passengersToGather.Count) Debug.LogError("Passenger count mismatch");
             currentStopGroup.RemovePassengers(passengersToGather);
-            if (count != passengersToGather.Count) Debug.LogError("Passenger count mismatch");
             if (Config.I.physicalPassengers) {
                 GatherPhysicalPassengers(passengersToGather);
-            if (count != passengersToGather.Count) Debug.LogError("Passenger count mismatch");
             }
         }
 
         private void GatherPhysicalPassengers(List<Passenger> passengersToGather) {
             for (int i = 0; i < passengersToGather.Count; i++) {
                 passengersToGather[i].transform.parent = passengersContainer.transform;
-
                 int index = passengers.Count - passengersToGather.Count + i;
                 SetPassengerGridPosition(index);
             }
@@ -135,20 +131,20 @@ namespace Simulation {
         private void DropOffPassengers() {
             List<Passenger> passengersToDropOff = passengers.FindAll(p => p.GetCurrentTransferStop() == currentStopGroup);
             List<Passenger> passengersAtFinalDestination = passengers.FindAll(p => p.GetDestination() == currentStopGroup);
-            // Debug.Log($"Removing {passengersAtFinalDestination.Count} passengers");
-            var count = passengersToDropOff.Count;
             foreach (Passenger passenger in passengersToDropOff) {
                 passengers.Remove(passenger);
                 passenger.RemoveTransfer();
             }
-            if (count != passengersToDropOff.Count) Debug.LogError("Passenger count mismatch");
-            // currentStopGroup.AddPassengers(passengersToDropOff);
+            currentStopGroup.AddPassengers(passengersToDropOff.Except(passengersAtFinalDestination).ToList());
             RemoveBatch(passengersAtFinalDestination);
             if (Config.I.physicalPassengers) ReorderPassengers();
         }
 
         private void RemoveBatch(List<Passenger> passengersToRemove) {
             // yield return TimeIndicator.WaitForSecondsScaled(5f);
+            foreach (Passenger passenger in passengersToRemove) {
+                passengers.Remove(passenger);
+            }
             PassengerSpawner.I.OnPassengerRemoved(passengersToRemove.Count);
             foreach (Passenger passenger in passengersToRemove) Destroy(passenger.gameObject);
         }
