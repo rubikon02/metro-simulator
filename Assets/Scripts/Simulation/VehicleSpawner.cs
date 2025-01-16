@@ -33,6 +33,7 @@ namespace Simulation {
             directions = SubwayLineGenerator.I.subwayLines.SelectMany(line => line.directions).ToArray();
             foreach (var direction in directions) {
                 direction.Initialize();
+                direction.SendVehicle();
             }
         }
     }

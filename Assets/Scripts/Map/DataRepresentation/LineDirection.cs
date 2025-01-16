@@ -21,7 +21,7 @@ namespace Map.DataRepresentation {
         }
 
         public void SendVehicle() {
-            if (waitingVehicles.Count > 0) {
+            if (waitingVehicles.Count > 1) {
                 spawnedAll = true;
                 if (waitingVehicles.TryDequeue(out var vehicle)) {
                     vehicle.StartMoving();
