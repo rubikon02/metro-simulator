@@ -8,6 +8,7 @@ using Map.DataRepresentation;
 using UI;
 using UnityEngine;
 using Utils;
+using Path = System.IO.Path;
 using Random = UnityEngine.Random;
 
 namespace Simulation {
@@ -35,6 +36,7 @@ namespace Simulation {
         [SerializeField] private Passenger passengerPrefab;
         [Header("Traffic Data")]
         [SerializeField] private List<DayTrafficAmount> weekTrafficAmounts = new();
+        private static readonly string trafficDataPath = Path.Combine(Application.dataPath.Replace("/", "\\"), "data", "DayTrafficAmounts.csv");
 
 
         public void OnPassengerRemoved(int count = 1) {
@@ -43,7 +45,7 @@ namespace Simulation {
         }
 
         public void StartSpawning() {
-            LoadTrafficData("Assets/Data/DayTrafficAmounts.csv");
+            LoadTrafficData(trafficDataPath);
             StartCoroutine(SpawnPassengers());
         }
 
