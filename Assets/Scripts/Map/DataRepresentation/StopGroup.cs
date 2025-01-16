@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Simulation;
@@ -14,6 +15,12 @@ namespace Map.DataRepresentation {
         [SerializeField] private GameObject passengersContainer;
         [SerializeField] private TextMeshProUGUI nameText;
         [SerializeField] private TextMeshProUGUI countText;
+        [SerializeField] private GameObject passengerPrefab;
+        private Vector3 cellSize;
+
+        private void Start() {
+            cellSize = passengerPrefab.GetComponentInChildren<Renderer>().bounds.size;
+        }
 
         public void SetName(string stopName) {
             name = stopName;
@@ -54,21 +61,27 @@ namespace Map.DataRepresentation {
             UpdateCountText();
         }
 
+        private void AddPhysicalPassenger(Passenger passenger) {
+            passenger.transform.parent = passengersContainer.transform;
+            SetPassengerGridPosition(passengers.Count - 1);
+        }
+
         public void RemovePassengers(IEnumerable<Passenger> passengersToRemove) {
             passengers = passengers.Except(passengersToRemove).ToList();
+            if (Config.I.physicalPassengers) {
+                ReorderPassengers();
+            }
             UpdateCountText();
         }
 
-        /// <summary>
-        /// Adds new passenger standing at the stop in the square shape
-        /// </summary>
-        /// <param name="passenger"></param>
-        private void AddPhysicalPassenger(Passenger passenger) {
-            passenger.transform.parent = passengersContainer.transform;
+        private void ReorderPassengers() {
+            for (int i = 0; i < passengers.Count; i++) {
+                SetPassengerGridPosition(i);
+            }
+        }
 
-            var cellSize = passenger.Size;
-
-            int n = passengers.Count;
+        private void SetPassengerGridPosition(int passengerIndex) {
+            int n = passengerIndex + 1;
             int k = Mathf.CeilToInt((Mathf.Sqrt(n) - 1) / 2);
             int m = 2 * k + 1;
             int p = n - (m - 2) * (m - 2);
@@ -88,7 +101,7 @@ namespace Map.DataRepresentation {
                 z = -k;
             }
 
-            passenger.transform.localPosition = new Vector3(x * cellSize.x, 0, z * cellSize.z);
+            passengers[passengerIndex].transform.localPosition = new Vector3(x * cellSize.x, 0, z * cellSize.z);
         }
 
         public List<SubwayLine> GetSubwayLines() {

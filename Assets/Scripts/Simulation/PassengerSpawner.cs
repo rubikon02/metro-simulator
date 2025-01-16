@@ -126,25 +126,25 @@ namespace Simulation {
             }
         }
 
-    private IEnumerator SpawnPassengers() {
-        while (true) {
-            var day = TimeIndicator.I.CurrentTime.DayOfWeek;
-            var currentTime = TimeIndicator.I.CurrentTime;
-            var dayTraffic = weekTrafficAmounts.FirstOrDefault(d => d.day == day.ToString());
+        private IEnumerator SpawnPassengers() {
+            while (true) {
+                var day = TimeIndicator.I.CurrentTime.DayOfWeek;
+                var currentTime = TimeIndicator.I.CurrentTime;
+                var dayTraffic = weekTrafficAmounts.FirstOrDefault(d => d.day == day.ToString());
 
-            if (dayTraffic != null) {
-                float timeInHours = currentTime.Hour + currentTime.Minute / 60f;
-                trafficIntensity = dayTraffic.trafficCurve.Evaluate(timeInHours);
+                if (dayTraffic != null) {
+                    float timeInHours = currentTime.Hour + currentTime.Minute / 60f;
+                    trafficIntensity = dayTraffic.trafficCurve.Evaluate(timeInHours);
 
-                float batchSize = spawnSpeed * spawnInterval * trafficIntensity;
-                for (int i = 0; i < batchSize; i++) {
-                    GeneratePassenger();
+                    float batchSize = spawnSpeed * spawnInterval * trafficIntensity;
+                    for (int i = 0; i < batchSize; i++) {
+                        GeneratePassenger();
+                    }
                 }
-            }
 
-            yield return TimeIndicator.WaitForSecondsScaled(spawnInterval);
+                yield return TimeIndicator.WaitForSecondsScaled(spawnInterval);
+            }
         }
-    }
 
         private void GeneratePassenger() {
             if(existingPassengerLimit > 0 && existingCount >= existingPassengerLimit) return;
