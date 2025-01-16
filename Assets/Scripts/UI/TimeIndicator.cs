@@ -90,7 +90,7 @@ namespace UI {
         }
 
         private void UpdateDayText() {
-            dayText.text = $@"<mspace=0.6em>{currentTime.DayOfWeek}</mspace>";
+            dayText.text = currentTime.DayOfWeek.ToString();
         }
 
         private void UpdateButtonStates() {
@@ -104,7 +104,7 @@ namespace UI {
         }
 
         public string GetDayOfWeek() {
-            return currentTime == null ? null : currentTime.DayOfWeek.ToString();
+            return currentTime.DayOfWeek.ToString();
         }
     }
 }
