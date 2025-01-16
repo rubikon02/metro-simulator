@@ -88,7 +88,7 @@ namespace Map.DataRepresentation {
                 z = -k;
             }
 
-            passenger.transform.localPosition = new Vector3(x * cellSize.x, passenger.transform.localPosition.y, z * cellSize.z);
+            passenger.transform.localPosition = new Vector3(x * cellSize.x, 0, z * cellSize.z);
         }
 
         public List<SubwayLine> GetSubwayLines() {
