@@ -13,6 +13,7 @@ namespace UI {
         public float SimulationSpeed => simulationSpeed;
 
         [Header("UI Elements")]
+        [SerializeField] private TextMeshProUGUI dayText;
         [SerializeField] private TextMeshProUGUI timeText;
         [SerializeField] private TextMeshProUGUI speedText;
         [SerializeField] private Button slowerButton;
@@ -49,6 +50,7 @@ namespace UI {
             if (!isPaused) {
                 currentTime = currentTime.AddSeconds(Time.deltaTime * simulationSpeed);
                 UpdateTimeText();
+                UpdateDayText();
             }
         }
 
@@ -87,6 +89,10 @@ namespace UI {
             timeText.text = $@"<mspace=0.6em>{currentTime:HH\:mm\:ss}</mspace>";
         }
 
+        private void UpdateDayText() {
+            dayText.text = $@"<mspace=0.6em>{currentTime.DayOfWeek}</mspace>";
+        }
+
         private void UpdateButtonStates() {
             slowerButton.interactable = currentSpeedIndex > 0;
             fasterButton.interactable = currentSpeedIndex < speeds.Length - 1;
@@ -95,6 +101,10 @@ namespace UI {
 
         private void InitializeTime() {
             currentTime = startTime;
+        }
+
+        public string GetDayOfWeek() {
+            return currentTime == null ? null : currentTime.DayOfWeek.ToString();
         }
     }
 }

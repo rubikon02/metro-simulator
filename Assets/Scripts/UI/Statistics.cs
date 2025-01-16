@@ -10,22 +10,29 @@ namespace UI {
     public class Statistics : MonoSingleton<Statistics> {
         public int ExistingCount => existingCount;
         public int DespawnedCount => despawnedCount;
+        public float TrafficIntensit => trafficIntensity;
 
         [Header("UI Elements")]
         [SerializeField] private TextMeshProUGUI existingText;
         [SerializeField] private TextMeshProUGUI despawnedText;
+        [SerializeField] private TextMeshProUGUI trafficText;
 
         private int despawnedCount => PassengerSpawner.I.GetDespawnedCount();
         private int existingCount => PassengerSpawner.I.GetExistingCount();
+        private float trafficIntensity => PassengerSpawner.I.GetTrafficIntensity();
+        private string dayOfWeek => TimeIndicator.I.GetDayOfWeek();
+
 
         private void Start() {
             UpdateExistingText();
             UpdateDespawnedText();
+            UpdateTrafficText();
         }
 
         private void Update() {
             UpdateExistingText();
-            UpdateDespawnedText();        
+            UpdateDespawnedText();  
+            UpdateTrafficText();      
         }
 
         private void UpdateExistingText() {
@@ -34,6 +41,10 @@ namespace UI {
 
         private void UpdateDespawnedText() {
             despawnedText.text = $"Passengers before: {despawnedCount}";
+        }
+
+        private void UpdateTrafficText() {
+            trafficText.text = $"Traffic instensity: {trafficIntensity:0.####}";
         }
     }
 }

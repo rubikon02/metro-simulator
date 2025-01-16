@@ -54,6 +54,11 @@ namespace Simulation {
             return despawnedCount;
         }
 
+        public float GetTrafficIntensity() {
+            return trafficIntensity;
+        }
+
+
         private void LoadTrafficData(string filePath) {
             string[] lines = File.ReadAllLines(filePath);
             string[] headers = lines[0].Split(';').Skip(1).ToArray();
