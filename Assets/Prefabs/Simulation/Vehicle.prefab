@@ -1053,6 +1053,7 @@ MonoBehaviour:
   passengerCountersContainer: {fileID: 3325706152729738889}
   passengerPlatform: {fileID: 8103066101087230559}
   passengerPrefab: {fileID: 4188480695162316221, guid: 5f308ed004d945e4a92938d6035ee29b, type: 3}
+  collider: {fileID: 7235844399793390358}
   passengerCounterTexts: []
   passengers: []
   collider: {fileID: 7235844399793390358}

@@ -76,6 +76,7 @@ namespace Map {
                 }
 
                 subwayLine.directions.Add(lineDirection);
+                lineDirection.line = subwayLine;
                 lineDirection.transform.parent = subwayLine.transform;
             }
 

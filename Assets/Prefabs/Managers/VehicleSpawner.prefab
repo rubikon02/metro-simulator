@@ -45,4 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   vehiclePrefab: {fileID: 7107007620874728960, guid: 2b9496bc6f52012469729d036faa81dd, type: 3}
-  spawnInterval: 100
+  spawnInterval: 300

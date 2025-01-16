@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine;
 using Map.DataRepresentation;
 using TMPro;
@@ -28,20 +29,26 @@ namespace Simulation {
         [SerializeField] private List<TextMeshProUGUI> passengerCounterTexts;
         [SerializeField] private List<Passenger> passengers = new();
 
-        private Vector3 cellSize;
-        private int gridWidth;
-        private int gridHeight;
-        private float xOffsetToCenter;
-        private Vector3 halfPlatformSize;
-        private Vector3 halfCellSize;
+        private static Vector3 cellSize;
+        private static int gridWidth;
+        private static int gridHeight;
+        private static float xOffsetToCenter;
+        private static Vector3 halfPlatformSize;
+        private static Vector3 halfCellSize;
 
-        private float initialColliderSize;
+        private static float initialColliderSize;
+
+        public void StartMoving() {
+            currentStopGroup ??= direction.stops[0].group;
+            stopped = false;
+            GatherPassengers();
+            UpdateTexts();
+        }
 
         private void Start() {
             if (direction == null || direction.path == null) return;
 
             initialColliderSize = collider.height;
-
             pathPositions = direction.path.GetPositions();
             transform.position = pathPositions[0];
             transform.LookAt(pathPositions[1]);
@@ -56,11 +63,11 @@ namespace Simulation {
             gridWidth = Mathf.FloorToInt(platformSize.x / cellSize.x);
             gridHeight = Mathf.FloorToInt(platformSize.z / cellSize.z);
             xOffsetToCenter = (platformSize.x - (gridWidth * cellSize.x)) / 2;
-        }
 
-        // private void OnDrawGizmos() {
-        //     Debug.Log(passengerPlatform.GetComponent<Renderer>().bounds.size);
-        // }
+            currentStopGroup = direction.stops[0].group;
+
+            StartMoving();
+        }
 
         private void FixedUpdate() {
             if (pathPositions == null || pathPositions.Count == 0) return;
@@ -83,11 +90,12 @@ namespace Simulation {
                 transform.position = targetPosition;
                 targetPositionIndex++;
                 if (targetPositionIndex >= pathPositions.Count) {
+                    stopped = true;
                     targetPositionIndex = 0;
                     direction = direction.oppositeDirection;
                     pathPositions = direction.path.GetPositions();
                     transform.rotation = Quaternion.LookRotation(pathPositions[1] - pathPositions[0]);
-                    StartCoroutine(HandleStop());
+                    direction.EnqueueVehicle(this);
                 } else {
                     step -= distanceToTarget;
                 }
@@ -103,11 +111,13 @@ namespace Simulation {
 
         private void OnTriggerEnter(Collider other) {
             if (!other.gameObject.CompareTag("Stop")) return;
-
             var newStopGroup = other.GetComponent<Stop>().group;
             if (newStopGroup == currentStopGroup) return;
             stopped = true;
             currentStopGroup = newStopGroup;
+            if (gridHeight == 0) {
+                Start();
+            }
             StartCoroutine(HandleStop());
         }
 
@@ -151,7 +161,6 @@ namespace Simulation {
         }
 
         private void RemoveBatch(List<Passenger> passengersToRemove) {
-            // yield return TimeIndicator.WaitForSecondsScaled(5f);
             foreach (Passenger passenger in passengersToRemove) {
                 passengers.Remove(passenger);
             }

@@ -44,3 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 772fd7f643c1f9043aa8bda703db209f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  stops: []
+  path: {fileID: 0}
+  platforms: []
+  id: 0
+  oppositeDirection: {fileID: 0}
+  line: {fileID: 0}
+  vehiclePrefab: {fileID: 7107007620874728960, guid: 2b9496bc6f52012469729d036faa81dd, type: 3}
