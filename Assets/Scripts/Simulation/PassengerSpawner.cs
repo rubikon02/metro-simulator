@@ -30,6 +30,7 @@ namespace Simulation {
         [SerializeField] private float busiestDaySpawnSpeed = 11f;
         [SerializeField] private float spawnInterval = 10f;
         [SerializeField] private int existingPassengerLimit = 1;
+        [SerializeField] private float intensityAdjustement = 1f;
         [Header("Prefabs")]
         [SerializeField] private Passenger passengerPrefab;
         [Header("Traffic Data")]
@@ -138,8 +139,13 @@ namespace Simulation {
                 var dayTraffic = weekTrafficAmounts.FirstOrDefault(d => d.day == day.ToString());
 
                 if (dayTraffic != null) {
-                    float timeInHours = currentTime.Hour + currentTime.Minute / 60f;
-                    trafficIntensity = dayTraffic.trafficCurve.Evaluate(timeInHours);
+                    float timeInHours = currentTime.Hour + currentTime.Minute / 60f + intensityAdjustement;
+                    if (timeInHours >= 24) {
+                        timeInHours -= 24;
+                        day = currentTime.AddDays(1).DayOfWeek;
+                        dayTraffic = weekTrafficAmounts.FirstOrDefault(d => d.day == day.ToString());
+                    }
+                    trafficIntensity = dayTraffic!.trafficCurve.Evaluate(timeInHours);
 
                     float batchSize = spawnSpeed * spawnInterval * trafficIntensity;
                     for (int i = 0; i < batchSize; i++) {
