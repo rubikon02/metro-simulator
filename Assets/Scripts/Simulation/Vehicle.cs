@@ -23,6 +23,8 @@ namespace Simulation {
         [SerializeField] private GameObject passengerCountersContainer;
         [SerializeField] private GameObject passengerPlatform;
         [SerializeField] private GameObject passengerPrefab;
+        [SerializeField] private CapsuleCollider collider;
+
         [SerializeField] private List<TextMeshProUGUI> passengerCounterTexts;
         [SerializeField] private List<Passenger> passengers = new();
 
@@ -33,8 +35,12 @@ namespace Simulation {
         private Vector3 halfPlatformSize;
         private Vector3 halfCellSize;
 
+        private float initialColliderSize;
+
         private void Start() {
             if (direction == null || direction.path == null) return;
+
+            initialColliderSize = collider.height;
 
             pathPositions = direction.path.GetPositions();
             transform.position = pathPositions[0];
@@ -62,6 +68,10 @@ namespace Simulation {
             if (!stopped) {
                 UpdatePosition();
             }
+        }
+
+        public void ResizeCollider(float factor) {
+            collider.height = initialColliderSize * factor;
         }
 
         private void UpdatePosition() {
