@@ -166,12 +166,15 @@ namespace Simulation {
         }
 
         private void SetPassengerGridPosition(int passengerIndex) {
-            int x = passengerIndex % gridWidth;
-            int z = passengerIndex / gridWidth;
+            int totalCells = gridWidth * gridHeight;
+            int floor = passengerIndex / totalCells;
+            int indexAtFloor = passengerIndex % totalCells;
+            int x = indexAtFloor % gridWidth;
+            int z = indexAtFloor / gridWidth;
 
             passengers[passengerIndex].transform.localPosition = new Vector3(
                 x * cellSize.x - halfPlatformSize.x + halfCellSize.x + xOffsetToCenter,
-                0,
+                floor * cellSize.y,
                 -(z * cellSize.z - halfPlatformSize.z + halfCellSize.z)
             );
         }
