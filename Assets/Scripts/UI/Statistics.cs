@@ -8,9 +8,6 @@ using Utils;
 
 namespace UI {
     public class Statistics : MonoSingleton<Statistics> {
-        public int ExistingCount => existingCount;
-        public int DespawnedCount => despawnedCount;
-        public float TrafficIntensit => trafficIntensity;
 
         [Header("UI Elements")]
         [SerializeField] private TextMeshProUGUI existingText;
@@ -20,19 +17,33 @@ namespace UI {
         private int despawnedCount => PassengerSpawner.I.GetDespawnedCount();
         private int existingCount => PassengerSpawner.I.GetExistingCount();
         private float trafficIntensity => PassengerSpawner.I.GetTrafficIntensity();
-        private string dayOfWeek => TimeIndicator.I.GetDayOfWeek();
-
+        private string dayOfWeek => TimeIndicator.I.CurrentTime.DayOfWeek.ToString();
+        private string lastDayOfWeek = null;
+        private int despawnedPast = 0;
 
         private void Start() {
             UpdateExistingText();
             UpdateDespawnedText();
             UpdateTrafficText();
+            if(lastDayOfWeek == null) {
+                lastDayOfWeek = dayOfWeek;
+                Debug.Log("nadano");
+            }
         }
 
         private void Update() {
             UpdateExistingText();
             UpdateDespawnedText();  
-            UpdateTrafficText();      
+            UpdateTrafficText();     
+            if(lastDayOfWeek == null) {
+                lastDayOfWeek = dayOfWeek;
+                Debug.Log("nadano");
+
+            } else if(lastDayOfWeek != dayOfWeek) {
+                Debug.Log("różne");
+                lastDayOfWeek = dayOfWeek;
+                despawnedPast = despawnedCount;
+            }
         }
 
         private void UpdateExistingText() {
@@ -40,11 +51,11 @@ namespace UI {
         }
 
         private void UpdateDespawnedText() {
-            despawnedText.text = $"Passengers transported: {despawnedCount}";
+            despawnedText.text = $"Passengers before: {despawnedCount - despawnedPast}";
         }
 
         private void UpdateTrafficText() {
-            trafficText.text = $"Traffic intensity: {trafficIntensity * 100:0}%";
+            trafficText.text = $"Traffic instensity: {trafficIntensity:0.####}";
         }
     }
 }

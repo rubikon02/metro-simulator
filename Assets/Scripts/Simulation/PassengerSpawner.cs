@@ -28,7 +28,7 @@ namespace Simulation {
         [SerializeField] private float spawnSpeed;
         [Header("Settings")]
         [Tooltip("People per second")]
-        [SerializeField] private float busiestDaySpawnSpeed = 11f;
+        [SerializeField] private float busiestDaySpawnSpeed = 110f;
         [SerializeField] private float spawnInterval = 10f;
         [SerializeField] private int existingPassengerLimit = 1;
         [SerializeField] private float intensityAdjustement = 1f;
