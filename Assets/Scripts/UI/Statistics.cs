@@ -51,11 +51,11 @@ namespace UI {
         }
 
         private void UpdateDespawnedText() {
-            despawnedText.text = $"Passengers before: {despawnedCount - despawnedPast}";
+            despawnedText.text = $"Passengers transported: {despawnedCount - despawnedPast}";
         }
 
         private void UpdateTrafficText() {
-            trafficText.text = $"Traffic instensity: {trafficIntensity:0.####}";
+            trafficText.text = $"Traffic intensity: {trafficIntensity * 100:0}%";
         }
     }
 }
