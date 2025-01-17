@@ -37,7 +37,7 @@ namespace UI {
 
         private void Start() {
             currentSpeedIndex = Array.IndexOf(speeds, simulationSpeed);
-            ResizeVehicleColliders();
+            ResizeColliders();
             slowerButton.onClick.AddListener(() => ChangeSpeed(-1));
             fasterButton.onClick.AddListener(() => ChangeSpeed(1));
             playPauseButton.onClick.AddListener(TogglePlayPause);
@@ -56,13 +56,13 @@ namespace UI {
 
         private void ChangeSpeed(int direction) {
             currentSpeedIndex = Mathf.Clamp(currentSpeedIndex + direction, 0, speeds.Length - 1);
-            ResizeVehicleColliders();
+            ResizeColliders();
             if (!isPaused) simulationSpeed = speeds[currentSpeedIndex];
             UpdateSpeedText();
             UpdateButtonStates();
         }
 
-        private void ResizeVehicleColliders() {
+        private void ResizeColliders() {
             float factor;
             if (speeds[currentSpeedIndex] <= 256f) {
                 factor = 1;
@@ -72,6 +72,9 @@ namespace UI {
 
             foreach (var vehicle in SubwayLineGenerator.I.subwayLines.SelectMany(line => line.vehicles)) {
                 vehicle.ResizeCollider(factor);
+            }
+            foreach (var stop in SubwayLineGenerator.I.stopGroups.SelectMany(group => group.stops)) {
+                stop.ResizeCollider(factor);
             }
         }
 

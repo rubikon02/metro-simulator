@@ -52,6 +52,7 @@ MonoBehaviour:
     lon: 0
   group: {fileID: 0}
   line: {fileID: 0}
+  collider: {fileID: 1409734706371999440}
 --- !u!65 &1409734706371999440
 BoxCollider:
   m_ObjectHideFlags: 0

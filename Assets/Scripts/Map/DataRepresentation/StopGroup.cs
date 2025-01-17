@@ -8,7 +8,7 @@ using Utils;
 
 namespace Map.DataRepresentation {
     public class StopGroup : MonoBehaviour {
-        [SerializeField] private List<Stop> stops;
+        public List<Stop> stops;
         public List<Passenger> passengers;
 
         [Header("Components")]
